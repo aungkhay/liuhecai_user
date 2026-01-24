@@ -4,7 +4,7 @@
             <template v-slot:prepend>
                 <v-app-bar-nav-icon icon="mdi-chevron-left" @click="router.back()"></v-app-bar-nav-icon>
             </template>
-            <v-app-bar-title>Record History</v-app-bar-title>
+            <v-app-bar-title>开奖记录</v-app-bar-title>
             <v-menu transition="scale-transition">
                 <template v-slot:activator="{ props }">
                     <v-btn variant="outlined" v-bind="props" class="mr-2">{{ selectedYear.title }}</v-btn>

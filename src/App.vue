@@ -7,5 +7,10 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
+import { GET_CURRENT_YEAR } from './js/api';
 
+onMounted(() => {
+    GET_CURRENT_YEAR(); 
+});
 </script>

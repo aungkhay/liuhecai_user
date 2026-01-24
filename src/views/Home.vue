@@ -29,7 +29,37 @@
                 </div>
             </div>
         </div>
-        <div class="pa-2 mt-2">
+
+        <v-carousel v-if="banners.length > 0" hide-delimiter-background :show-arrows="false" height="180" cycle hide-delimiters>
+            <v-carousel-item v-for="(banner, index) in banners" :key="index"
+                :src="filePath + banner.image"
+                cover
+            ></v-carousel-item>
+        </v-carousel>
+
+        <div class="pa-2">
+
+            <div class="border rounded-lg mb-3">
+                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">发什么开什么</div>
+                <v-table>
+                    <tbody>
+                        <tr v-for="(result, index) in resultGuesses" :key="index">
+                            <td class="text-h6 font-weight-bold">
+                                <span>{{ `${result.batch_number.padStart(3, '0')}期:` }}</span>
+                                <span class="text-red">【{{ result.zodiac_attr }}】</span>
+                                <span v-if="result.result_match == 0">开:?</span>
+                                <span v-if="result.result_match == 1">
+                                    开:<span class="text-red">{{ `${String(result.result_number).padStart(2, '0')}${result.zodiac_name}` }}</span>准
+                                </span>
+                                <span v-if="result.result_match == 2">
+                                    开:<span class="text-red">{{ `${String(result.result_number).padStart(2, '0')}${result.zodiac_name}` }}</span>不准
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </v-table>
+            </div>
+            
             <div class="border rounded-lg">
                 <div class="text-center font-weight-bold text-h6 bg-grey-lighten-3 rounded-t-lg">{{ currentYear }}年（十二生肖号码对照）</div>
                 <div class="pa-2">
@@ -105,24 +135,47 @@
                     </v-table>
                 </div>
             </div>
+            <div class="border rounded-lg mt-3 mb-3">
+                <div class="text-center font-weight-bold text-h6 bg-grey-lighten-3 rounded-t-lg">生肖属性</div>
+                <div>
+                    <v-table density="compact">
+                        <tbody>
+                            <tr v-for="(attribute, index) in attributes" :key="index">
+                                <td style="min-width: 80px;" class="text-primary">{{ attribute.attribute_name }}</td>
+                                <td>
+                                    <div class="d-flex">
+                                        <div v-for="(zoc, i) in attribute.zodiacs" :key="i">
+                                            <span class="pa-1">{{ zoc }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </v-table>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { GET_LAST_RECORD } from '../js/api';
+import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS } from '../js/api';
 import { useZodiacStore } from '../stores/zodiac';
 import router from '../routers';
 import Appbar from '../components/Appbar.vue';
+import { useGlobalStore } from '../stores/global';
 
 const zodiacStore = useZodiacStore();
+const globalStore = useGlobalStore();
 
+const filePath = computed(() => globalStore.getFilePath);
 const xZodiacs = computed(() => zodiacStore.getxZodiacs);
 const currentYear = computed(() => zodiacStore.getCurrentYear);
 const wuxing = computed(() => zodiacStore.getWuXingNumbers);
 const colors = computed(() => zodiacStore.getColorNumbers);
 const oddEvens = computed(() => zodiacStore.getOddEvenNumbers);
+const attributes = computed(() => zodiacStore.getAttributes);
 const recordType = ref([
     { label: '平台六合彩', value: 'platform' }, 
     { label: '澳门六合彩', value: 'aomen' }, 
@@ -130,6 +183,8 @@ const recordType = ref([
 ]);
 const currentRecordType = ref(recordType.value[0].value);
 const lastRecord = ref({});
+const banners = ref([]);
+const resultGuesses = ref([]);
 
 const getImg = (name) =>new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
@@ -154,6 +209,13 @@ const oddEvenMap = {
     'even': '合数双'
 };
 
+const getBanners = async () => {
+    const res = await GET_BANNERS();
+    if (res.code === 1000) {
+        banners.value = res.data;
+    }
+};
+
 const goHistory = (type) => {
     router.push({ name: 'RecordHistory', query: { type } });
 };
@@ -166,9 +228,18 @@ const getLastRecord = async (type) => {
     }
 };
 
+const getResultGuesses = async () => {
+    const res = await GET_RESULT_GUESS();
+    if (res.code === 1000) {
+        resultGuesses.value = res.data.reverse();
+    }
+};
+
 onMounted(async () => {
     zodiacStore.orderZodiac(currentYear.value);
-    await getLastRecord(currentRecordType.value);
+    getBanners();
+    getLastRecord(currentRecordType.value);
+    getResultGuesses();
 });
 
 </script>

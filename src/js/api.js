@@ -3,21 +3,16 @@ import { useZodiacStore } from '../stores/zodiac';
 
 const prefix = '/api';
 
-export const getZodiacNumbers = async () => {
-    const zodiacStore = useZodiacStore();
-    const res = await API.get(`${prefix}/zodiac/numbers`);
-    if (res.code == 1000) {
-        zodiacStore.numbers = res.data;
+export const GET_CURRENT_YEAR = async () => {
+    const res = await API.get(`${prefix}/current-year`);
+    if (res.code === 1000) {
+        const zodiacStore = useZodiacStore();
+        zodiacStore.setCurrentYear(res.data.year);
     }
 }
 
-export const getZodiacList = async () => {
-    const zodiacStore = useZodiacStore();
-    const res = await API.get(`${prefix}/zodiac/list`);
-    if (res.code == 1000) {
-        zodiacStore.currentYear = res.data.current_year;
-        zodiacStore.zodiacs = res.data.zodiacs;
-    }
+export const GET_BANNERS = async () => {
+    return await API.get(`${prefix}/banners`);
 }
 
 export const GET_LAST_RECORD = async (lottery_type = 'aomen') => {
@@ -30,4 +25,8 @@ export const GET_LOTTERY_RECORD_HISTORY = async (lottery_type = 'aomen', page = 
     return await API.get(`${prefix}/lottery-record/history`, {
         params: { lottery_type, page, perPage, year }
     });
+}
+
+export const GET_RESULT_GUESS = async () => {
+    return await API.get(`${prefix}/result-guess`);
 }
