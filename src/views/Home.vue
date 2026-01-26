@@ -74,6 +74,22 @@
                     </tbody>
                 </v-table>
             </div>
+             <div class="border rounded-lg mb-3">
+                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">他不准我哭【投资平特】</div>
+                <v-table>
+                    <tbody>
+                        <tr v-for="(item, index) in touziPingTe" :key="index">
+                            <td>
+                                <div class="text-h6 font-weight-bold">
+                                    {{ `${String(item.batch_start).padStart(3, '0')}-${String(item.batch_end).padStart(3, '0')}期:` }}
+                                    <span class="text-red">【{{ item.zodiac_name }}{{ item.zodiac_name }}】</span>
+                                    <span>开({{ item.open_count > 0 ? item.open_count : '?' }}期)</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </v-table>
+            </div>
             
             <div class="border rounded-lg">
                 <div class="text-center font-weight-bold text-h6 bg-grey-lighten-3 rounded-t-lg">{{ currentYear }}年（十二生肖号码对照）</div>
@@ -175,7 +191,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA } from '../js/api';
+import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE } from '../js/api';
 import { useZodiacStore } from '../stores/zodiac';
 import router from '../routers';
 import Appbar from '../components/Appbar.vue';
@@ -203,6 +219,7 @@ const resultGuesses = ref([]);
 const qixiao = ref({});
 const wuxiao = ref({});
 const sanxiao = ref({});
+const touziPingTe = ref([]);
 
 const getImg = (name) =>new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
@@ -285,12 +302,20 @@ const getXiaoMa = async () => {
     }
 };
 
+const getTouziPingTe = async () => {
+    const res = await GET_TOUZI_PING_TE();
+    if (res.code === 1000) {
+        touziPingTe.value = res.data.reverse();
+    }
+};
+
 onMounted(async () => {
     zodiacStore.orderZodiac(currentYear.value);
     getBanners();
     getLastRecord(currentRecordType.value);
     getResultGuesses();
     getXiaoMa();
+    getTouziPingTe();
 });
 
 </script>

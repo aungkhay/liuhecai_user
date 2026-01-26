@@ -34,3 +34,7 @@ export const GET_RESULT_GUESS = async () => {
 export const GET_XIAO_MA = async () => {
     return await API.get(`${prefix}/get-xiao-ma`);
 }
+
+export const GET_TOUZI_PING_TE = async () => {
+    return await API.get(`${prefix}/tou-zi-ping-te`);
+}
