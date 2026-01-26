@@ -30,3 +30,7 @@ export const GET_LOTTERY_RECORD_HISTORY = async (lottery_type = 'aomen', page = 
 export const GET_RESULT_GUESS = async () => {
     return await API.get(`${prefix}/result-guess`);
 }
+
+export const GET_XIAO_MA = async () => {
+    return await API.get(`${prefix}/get-xiao-ma`);
+}
