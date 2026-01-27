@@ -74,7 +74,7 @@
                     </tbody>
                 </v-table>
             </div>
-             <div class="border rounded-lg mb-3">
+            <div class="border rounded-lg mb-3">
                 <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">他不准我哭【投资平特】</div>
                 <v-table>
                     <tbody>
@@ -84,6 +84,28 @@
                                     {{ `${String(item.batch_start).padStart(3, '0')}-${String(item.batch_end).padStart(3, '0')}期:` }}
                                     <span class="text-red">【{{ item.zodiac_name }}{{ item.zodiac_name }}】</span>
                                     <span>开({{ item.open_count > 0 ? item.open_count : '?' }}期)</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </v-table>
+            </div>
+            <div class="border rounded-lg mb-3">
+                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">大神双波</div>
+                <v-table>
+                    <tbody>
+                        <tr v-for="(item, index) in doubleColor" :key="index">
+                            <td>
+                                <div class="text-h6 font-weight-bold">
+                                    {{ `${String(item.batch_number).padStart(3, '0')}期:` }}
+                                    <span class="text-red">
+                                        【<span :class="{'bg-amber': item.color_one === item.match_color}">{{ colorsMap[item.color_one] }}波</span>+<span :class="{'bg-amber': item.color_two === item.match_color}">{{ colorsMap[item.color_two] }}波</span>】
+                                    </span>
+                                    <span>开:
+                                        <span v-if="item.result_number == 0">?</span>
+                                        <span v-else class="text-blue">{{ item.zodiac_name }}{{ String(item.result_number).padStart(2, '0') }}</span>
+                                        <span v-if="item.match_color == item.color_one || item.match_color == item.color_two">准</span>
+                                    </span>
                                 </div>
                             </td>
                         </tr>
@@ -191,7 +213,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE } from '../js/api';
+import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE, GET_DOUBLE_COLOR } from '../js/api';
 import { useZodiacStore } from '../stores/zodiac';
 import router from '../routers';
 import Appbar from '../components/Appbar.vue';
@@ -220,6 +242,7 @@ const qixiao = ref({});
 const wuxiao = ref({});
 const sanxiao = ref({});
 const touziPingTe = ref([]);
+const doubleColor = ref([]);
 
 const getImg = (name) =>new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
@@ -309,6 +332,13 @@ const getTouziPingTe = async () => {
     }
 };
 
+const getDoubleColor = async () => {
+    const res = await GET_DOUBLE_COLOR();
+    if (res.code === 1000) {
+        doubleColor.value = res.data;
+    }
+}
+
 onMounted(async () => {
     zodiacStore.orderZodiac(currentYear.value);
     getBanners();
@@ -316,6 +346,7 @@ onMounted(async () => {
     getResultGuesses();
     getXiaoMa();
     getTouziPingTe();
+    getDoubleColor();
 });
 
 </script>

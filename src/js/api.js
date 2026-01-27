@@ -38,3 +38,7 @@ export const GET_XIAO_MA = async () => {
 export const GET_TOUZI_PING_TE = async () => {
     return await API.get(`${prefix}/tou-zi-ping-te`);
 }
+
+export const GET_DOUBLE_COLOR = async () => {
+    return await API.get(`${prefix}/double-color`);
+}
