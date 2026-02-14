@@ -8,9 +8,12 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import { GET_CURRENT_YEAR } from './js/api';
+import { useZodiacStore } from './stores/zodiac';
+
+const zodiacStore = useZodiacStore();
 
 onMounted(() => {
-    GET_CURRENT_YEAR(); 
+    console.log('App mounted. Initializing zodiac store...');
+    zodiacStore.setCurrentYear();
 });
 </script>

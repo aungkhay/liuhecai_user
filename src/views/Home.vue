@@ -38,6 +38,16 @@
         </v-carousel>
 
         <div class="pa-2">
+            <div v-if="referenceLinks.length" class="border rounded-lg mb-3">
+                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">参考链接</div>
+                <div class="my-1">
+                    <div v-for="(refLink, index) in referenceLinks" :key="index" class="px-2 py-1">
+                        <a :href="refLink.url" target="_blank">
+                            <v-img :src="filePath + refLink.image" width="100%" height="60" cover class="rounded-lg"></v-img>
+                        </a>
+                    </div>
+                </div>
+            </div>
 
             <div class="border rounded-lg mb-3">
                 <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">发什么开什么</div>
@@ -213,7 +223,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE, GET_DOUBLE_COLOR } from '../js/api';
+import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE, GET_DOUBLE_COLOR, GET_REFERENCE_LINK } from '../js/api';
 import { useZodiacStore } from '../stores/zodiac';
 import router from '../routers';
 import Appbar from '../components/Appbar.vue';
@@ -243,6 +253,7 @@ const wuxiao = ref({});
 const sanxiao = ref({});
 const touziPingTe = ref([]);
 const doubleColor = ref([]);
+const referenceLinks = ref([]);
 
 const getImg = (name) =>new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
@@ -339,14 +350,22 @@ const getDoubleColor = async () => {
     }
 }
 
+const getReferenceLinks = async () => {
+    const res = await GET_REFERENCE_LINK();
+    if (res.code === 1000) {
+        referenceLinks.value = res.data;
+    }
+}
+
 onMounted(async () => {
-    zodiacStore.orderZodiac(currentYear.value);
+    zodiacStore.orderZodiac();
     getBanners();
     getLastRecord(currentRecordType.value);
     getResultGuesses();
     getXiaoMa();
     getTouziPingTe();
     getDoubleColor();
+    getReferenceLinks();
 });
 
 </script>

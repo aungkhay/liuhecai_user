@@ -42,3 +42,7 @@ export const GET_TOUZI_PING_TE = async () => {
 export const GET_DOUBLE_COLOR = async () => {
     return await API.get(`${prefix}/double-color`);
 }
+
+export const GET_REFERENCE_LINK = async () => {
+    return await API.get(`${prefix}/reference-links`);
+}
