@@ -11,12 +11,12 @@
                     </v-col>
                 </v-row>
             </v-card>
-            <div v-if="Object.keys(lastRecord).length > 0" class="d-flex align-center justify-space-between bg-white my-2 mx-2 px-2 rounded-lg" @click="goHistory(currentRecordType)">
+            <div v-if="lastRecordArr.length > 0" class="d-flex align-center justify-space-between bg-white my-2 mx-2 px-2 rounded-lg" @click="goHistory(currentRecordType)">
                 <div class="mr-2">
-                    <div class="font-weight-bold">{{ lastRecord.batch_number.padStart(3, '0') }}期</div>
+                    <div class="font-weight-bold">{{ lastRecord.batch_number }}期</div>
                     <div class="text-red">开奖记录</div>
                 </div>
-                <div class="d-flex align-center my-3">
+                <!-- <div class="d-flex align-center my-3">
                     <div v-for="n in 6" :key="n" class="circle-wrapper mr-1">
                         <v-img :src="getCircleBallImg(lastRecord[`num${n}_desc`])" width="30" height="30" cover/>
                         <div class="circle-text">{{ lastRecord[`num${n}`].toString().padStart(2, '0') }}</div>
@@ -25,6 +25,17 @@
                     <div class="circle-wrapper mr-1">
                         <v-img :src="getCircleBallImg(lastRecord.num7_desc)" width="30" height="30" cover/>
                         <div class="circle-text">{{ lastRecord.num7.toString().padStart(2, '0') }}</div>
+                    </div>
+                </div> -->
+                <div class="d-flex align-center my-3">
+                    <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="circle-wrapper mr-1">
+                        <v-img :src="getCircleBallImg(String(lastRecordArr[n - 1]?.desc))" width="30" height="30" cover/>
+                        <div class="circle-text">{{ Number(lastRecordArr[n - 1]?.num).toString().padStart(2, '0') }}</div>
+                    </div>
+                    <div class="px-1" v-if="lastRecordArr.length === 7"><v-icon>mdi-plus</v-icon></div>
+                    <div class="circle-wrapper mr-1" v-if="lastRecordArr.length === 7">
+                        <v-img :src="getCircleBallImg(String(lastRecordArr[6]?.desc))" width="30" height="30" cover/>
+                        <div class="circle-text">{{ Number(lastRecordArr[6]?.num).toString().padStart(2, '0') }}</div>
                     </div>
                 </div>
             </div>
@@ -93,7 +104,8 @@
                                 <div class="text-h6 font-weight-bold">
                                     {{ `${String(item.batch_start).padStart(3, '0')}-${String(item.batch_end).padStart(3, '0')}期:` }}
                                     <span class="text-red">【{{ item.zodiac_name }}{{ item.zodiac_name }}】</span>
-                                    <span>开({{ item.open_count > 0 ? item.open_count : '?' }}期)</span>
+                                    <span v-if="item.is_finished">开({{ item.open_count }}期)</span>
+                                    <span v-else>开({{ item.open_count > 0 ? item.open_count : '?' }}期)</span>
                                 </div>
                             </td>
                         </tr>
@@ -222,7 +234,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE, GET_DOUBLE_COLOR, GET_REFERENCE_LINK } from '../js/api';
 import { useZodiacStore } from '../stores/zodiac';
 import router from '../routers';
@@ -246,6 +258,7 @@ const recordType = ref([
 ]);
 const currentRecordType = ref(recordType.value[0].value);
 const lastRecord = ref({});
+const lastRecordArr = ref([]);
 const banners = ref([]);
 const resultGuesses = ref([]);
 const qixiao = ref({});
@@ -296,6 +309,43 @@ const getLastRecord = async (type) => {
         lastRecord.value = res.data;
     }
 };
+
+watch(
+    () => lastRecord.value,
+    (newVal) => {
+        lastRecordArr.value = [];
+        const num1 = { num: newVal.num1, desc: newVal.num1_desc };
+        const num2 = { num: newVal.num2, desc: newVal.num2_desc };
+        const num3 = { num: newVal.num3, desc: newVal.num3_desc };
+        const num4 = { num: newVal.num4, desc: newVal.num4_desc };
+        const num5 = { num: newVal.num5, desc: newVal.num5_desc };
+        const num6 = { num: newVal.num6, desc: newVal.num6_desc };
+        const num7 = { num: newVal.num7, desc: newVal.num7_desc };
+
+        const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 70000; // 开奖时间+70秒
+        const timeNow = Date.now();
+        
+        if (timeToDisplay >= timeNow) {
+            const interval = setInterval(() => {
+                const secondsPassed = Math.floor((Date.now() - new Date(newVal.createdAt).getTime()) / 1000);
+                for (let i = 1; i <= 7; i++) {
+                    if (i * 10 <= secondsPassed) {
+                        if (lastRecordArr.value.some(record => record.num === newVal[`num${i}`])) {
+                            continue;
+                        }
+                        lastRecordArr.value.push(eval(`num${i}`));
+                    }
+                }
+                if (secondsPassed >= 70) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        } else {
+            lastRecordArr.value.push(num1, num2, num3, num4, num5, num6, num7);
+        }
+    },
+    { immediate: true }
+);
 
 const getResultGuesses = async () => {
     const res = await GET_RESULT_GUESS();

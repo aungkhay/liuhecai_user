@@ -92,7 +92,16 @@ const getRecords = async (year) => {
         if (isLoadMore.value) {
             records.value = [...records.value, ...res.data.records];
         } else {
-            records.value = res.data.records;
+            const lastRecord = res.data.records[0] || {};
+            const timeToDisplay = new Date(lastRecord.createdAt).getTime() + 70000;
+            if (Date.now() < timeToDisplay) {
+                records.value = res.data.records.slice(1);
+                setTimeout(() => {
+                    records.value = res.data.records;
+                }, timeToDisplay - Date.now());
+            } else {
+                records.value = res.data.records;
+            }
         }
         total.value = res.data.meta.total;
         totalPage.value = res.data.meta.totalPage;
