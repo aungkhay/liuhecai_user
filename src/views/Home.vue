@@ -28,14 +28,20 @@
                     </div>
                 </div> -->
                 <div class="d-flex align-center my-3">
-                    <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="circle-wrapper mr-1">
-                        <v-img :src="getCircleBallImg(String(lastRecordArr[n - 1]?.desc))" width="30" height="30" cover/>
-                        <div class="circle-text">{{ Number(lastRecordArr[n - 1]?.num).toString().padStart(2, '0') }}</div>
+                    <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="mr-1">
+                        <div class="circle-wrapper">
+                            <v-img :src="getCircleBallImg(String(lastRecordArr[n - 1]?.desc))" width="33" height="33" cover/>
+                            <div class="circle-text">{{ String(lastRecordArr[n - 1]?.num).padStart(2, '0') }}</div>
+                        </div>
+                        <div class="text-caption text-center">{{ getZodiacName(String(lastRecordArr[n - 1]?.desc)) }}</div>
                     </div>
-                    <div class="px-1" v-if="lastRecordArr.length === 7"><v-icon>mdi-plus</v-icon></div>
-                    <div class="circle-wrapper mr-1" v-if="lastRecordArr.length === 7">
-                        <v-img :src="getCircleBallImg(String(lastRecordArr[6]?.desc))" width="30" height="30" cover/>
-                        <div class="circle-text">{{ Number(lastRecordArr[6]?.num).toString().padStart(2, '0') }}</div>
+                    <div v-if="lastRecordArr.length === 7"><v-icon>mdi-plus</v-icon></div>
+                    <div v-if="lastRecordArr.length === 7">
+                        <div class="circle-wrapper mr-1">
+                            <v-img :src="getCircleBallImg(String(lastRecordArr[6]?.desc))" width="30" height="30" cover/>
+                            <div class="circle-text">{{ String(lastRecordArr[6]?.num).padStart(2, '0') }}</div>
+                        </div>
+                        <div class="text-caption text-center">{{ getZodiacName(String(lastRecordArr[6]?.desc)) }}</div>
                     </div>
                 </div>
             </div>
@@ -272,6 +278,10 @@ const getImg = (name) =>new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).
 const getCircleBallImg = (num_desc) => {
     const color = num_desc.split('/')[2]
     return new URL(`../assets/circle-ball/${color}-circle.png`, import.meta.url).href;
+}
+const getZodiacName = (num_desc) => {
+    const desc = num_desc?.split('/');
+    return desc[0];
 }
 
 const wuxingMap = {
