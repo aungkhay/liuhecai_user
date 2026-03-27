@@ -22,7 +22,10 @@
             </template>
         </v-app-bar>
 
-        <div id="item-list">
+        <div v-if="isLoading" class="d-flex align-center justify-center my-4">
+            <v-progress-circular indeterminate size="24" width="2" color="primary"></v-progress-circular>
+        </div>
+        <div v-else id="item-list">
             <div v-for="(record, index) in records" :key="index" class="d-flex align-center justify-space-between bg-white my-2 px-2 rounded-lg">
                 <div class="mr-2" style="min-width: 70px;">
                     <div class="text-grey-darken-2 text-caption">{{ $filters.formatDate(record.draw_date) }}</div>
@@ -73,6 +76,7 @@ const recordType = ref([
 ]);
 const currentRecordType = ref(route.query.type || recordType.value[1].value);
 const isLoadMore = ref(false);
+const isLoading = ref(false);
 
 const zodiacStore = useZodiacStore();
 const numbers = computed(() => zodiacStore.getNumbers);
@@ -87,6 +91,7 @@ const getRecords = async (year) => {
         page.value = 1;
         records.value = [];
     }
+    isLoading.value = !isLoadMore.value;
     const res = await GET_LOTTERY_RECORD_HISTORY(currentRecordType.value, page.value, perPage.value, year);
     if (res.code === 1000) {
         if (isLoadMore.value) {
@@ -107,6 +112,9 @@ const getRecords = async (year) => {
         totalPage.value = res.data.meta.totalPage;
     }
     isLoadMore.value = false;
+    setTimeout(() => {
+        isLoading.value = false;
+    }, 1000);
 }
 
 const onTabChange = (value) => {
@@ -166,5 +174,15 @@ onBeforeUnmount(() => {
     font-weight: bold;
     font-size: 14px;
     z-index: 2;
+}
+
+@media screen and (max-width: 360px) {
+    .circle-wrapper {
+        width: 25px;
+        height: 25px;
+    }
+    .circle-text {
+        font-size: 11px;
+    }
 }
 </style>

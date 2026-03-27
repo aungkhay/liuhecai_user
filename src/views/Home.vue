@@ -12,22 +12,14 @@
                 </v-row>
             </v-card>
             <div v-if="lastRecordArr.length > 0" class="d-flex align-center justify-space-between bg-white my-2 mx-2 px-2 rounded-lg" @click="goHistory(currentRecordType)">
-                <div class="mr-2">
-                    <div class="font-weight-bold">{{ lastRecord.batch_number }}期</div>
-                    <div class="text-red">开奖记录</div>
+                <div class="mr-2" style="min-width: 60px;">
+                    <div class="font-weight-bold">{{ lastRecord?.batch_number }}期</div>
+                    <div class="text-red text-caption">开奖记录</div>
                 </div>
-                <!-- <div class="d-flex align-center my-3">
-                    <div v-for="n in 6" :key="n" class="circle-wrapper mr-1">
-                        <v-img :src="getCircleBallImg(lastRecord[`num${n}_desc`])" width="30" height="30" cover/>
-                        <div class="circle-text">{{ lastRecord[`num${n}`].toString().padStart(2, '0') }}</div>
-                    </div>
-                    <div class="px-1"><v-icon>mdi-plus</v-icon></div>
-                    <div class="circle-wrapper mr-1">
-                        <v-img :src="getCircleBallImg(lastRecord.num7_desc)" width="30" height="30" cover/>
-                        <div class="circle-text">{{ lastRecord.num7.toString().padStart(2, '0') }}</div>
-                    </div>
-                </div> -->
-                <div class="d-flex align-center my-3">
+                <div v-if="gettingLastRecord" style="min-height: 69.5px;" class="d-flex align-center justify-center">
+                    <v-progress-circular indeterminate size="24" width="2" color="primary"></v-progress-circular>
+                </div>
+                <div v-else class="d-flex align-center my-3 overflow-x-auto">
                     <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="mr-1">
                         <div class="circle-wrapper">
                             <v-img :src="getCircleBallImg(String(lastRecordArr[n - 1]?.desc))" width="33" height="33" cover/>
@@ -35,7 +27,7 @@
                         </div>
                         <div class="text-caption text-center">{{ getZodiacName(String(lastRecordArr[n - 1]?.desc)) }}</div>
                     </div>
-                    <div v-if="lastRecordArr.length === 7"><v-icon>mdi-plus</v-icon></div>
+                    <div v-if="lastRecordArr.length === 7"><v-icon size="small">mdi-plus</v-icon></div>
                     <div v-if="lastRecordArr.length === 7">
                         <div class="circle-wrapper mr-1">
                             <v-img :src="getCircleBallImg(String(lastRecordArr[6]?.desc))" width="30" height="30" cover/>
@@ -263,6 +255,7 @@ const recordType = ref([
     { label: '香港六合彩', value: 'hongkong' }
 ]);
 const currentRecordType = ref(recordType.value[0].value);
+const gettingLastRecord = ref(false);
 const lastRecord = ref({});
 const lastRecordArr = ref([]);
 const banners = ref([]);
@@ -313,11 +306,15 @@ const goHistory = (type) => {
 };
 
 const getLastRecord = async (type) => {
+    gettingLastRecord.value = true;
     currentRecordType.value = type;
     const res = await GET_LAST_RECORD(type);
     if (res.code === 1000) {
         lastRecord.value = res.data;
     }
+    setTimeout(() => {
+        gettingLastRecord.value = false;
+    }, 1000);
 };
 
 watch(
@@ -446,5 +443,15 @@ onMounted(async () => {
     font-weight: bold;
     font-size: 14px;
     z-index: 2;
+}
+
+@media screen and (max-width: 360px) {
+    .circle-wrapper {
+        width: 25px;
+        height: 25px;
+    }
+    .circle-text {
+        font-size: 11px;
+    }
 }
 </style>
