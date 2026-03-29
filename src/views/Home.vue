@@ -250,7 +250,7 @@ const colors = computed(() => zodiacStore.getColorNumbers);
 const oddEvens = computed(() => zodiacStore.getOddEvenNumbers);
 const attributes = computed(() => zodiacStore.getAttributes);
 const recordType = ref([
-    { label: '平台六合彩', value: 'platform' }, 
+    { label: '奥博彩', value: 'platform' }, 
     { label: '澳门六合彩', value: 'aomen' }, 
     { label: '香港六合彩', value: 'hongkong' }
 ]);
@@ -314,7 +314,7 @@ const getLastRecord = async (type) => {
     }
     setTimeout(() => {
         gettingLastRecord.value = false;
-    }, 1000);
+    }, 500);
 };
 
 watch(
@@ -329,24 +329,24 @@ watch(
         const num6 = { num: newVal.num6, desc: newVal.num6_desc };
         const num7 = { num: newVal.num7, desc: newVal.num7_desc };
 
-        const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 70000; // 开奖时间+70秒
+        const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 35000; // 开奖时间+35秒
         const timeNow = Date.now();
         
         if (timeToDisplay >= timeNow) {
             const interval = setInterval(() => {
                 const secondsPassed = Math.floor((Date.now() - new Date(newVal.createdAt).getTime()) / 1000);
                 for (let i = 1; i <= 7; i++) {
-                    if (i * 10 <= secondsPassed) {
+                    if (i * 5 <= secondsPassed) {
                         if (lastRecordArr.value.some(record => record.num === newVal[`num${i}`])) {
                             continue;
                         }
                         lastRecordArr.value.push(eval(`num${i}`));
                     }
                 }
-                if (secondsPassed >= 70) {
+                if (secondsPassed >= 35) {
                     clearInterval(interval);
                 }
-            }, 1000);
+            }, 500);
         } else {
             lastRecordArr.value.push(num1, num2, num3, num4, num5, num6, num7);
         }

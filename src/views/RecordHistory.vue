@@ -2,7 +2,7 @@
     <div>
         <v-app-bar density="compact" :elevation="0" style="background: linear-gradient(to right, #2fe62c, #4dfd46);">
             <template v-slot:prepend>
-                <v-app-bar-nav-icon icon="mdi-chevron-left" @click="router.back()"></v-app-bar-nav-icon>
+                <v-app-bar-nav-icon icon="mdi-chevron-left" @click="router.go(-1)"></v-app-bar-nav-icon>
             </template>
             <v-app-bar-title>开奖记录</v-app-bar-title>
             <v-menu transition="scale-transition">
@@ -62,7 +62,7 @@ import { useZodiacStore } from '../stores/zodiac';
 import { computed } from 'vue';
 const route = useRoute();
 
-const items = ref([2026, 2025, 2024, 2023, 2022].map(year => ({ title: `${year}年` })));
+const items = ref([2026, 2025].map(year => ({ title: `${year}年` })));
 const selectedYear = ref(items.value[0]);
 const records = ref([]);
 const page = ref(1);
@@ -70,7 +70,7 @@ const perPage = ref(10);
 const total = ref(0);
 const totalPage = ref(0);
 const recordType = ref([
-    { label: '平台六合彩', value: 'platform' }, 
+    { label: '奥博彩', value: 'platform' }, 
     { label: '澳门六合彩', value: 'aomen' }, 
     { label: '香港六合彩', value: 'hongkong' }
 ]);
@@ -98,7 +98,7 @@ const getRecords = async (year) => {
             records.value = [...records.value, ...res.data.records];
         } else {
             const lastRecord = res.data.records[0] || {};
-            const timeToDisplay = new Date(lastRecord.createdAt).getTime() + 70000;
+            const timeToDisplay = new Date(lastRecord.createdAt).getTime() + 35000;
             if (Date.now() < timeToDisplay) {
                 records.value = res.data.records.slice(1);
                 setTimeout(() => {
