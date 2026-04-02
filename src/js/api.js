@@ -3,13 +3,13 @@ import { useZodiacStore } from '../stores/zodiac';
 
 const prefix = '/api';
 
-export const GET_CURRENT_YEAR = async () => {
-    const res = await API.get(`${prefix}/current-year`);
-    if (res.code === 1000) {
-        const zodiacStore = useZodiacStore();
-        zodiacStore.setCurrentYear(res.data.year);
-    }
-}
+// export const GET_CURRENT_YEAR = async () => {
+//     const res = await API.get(`${prefix}/current-year`);
+//     if (res.code === 1000) {
+//         const zodiacStore = useZodiacStore();
+//         zodiacStore.setCurrentYear(res.data.year);
+//     }
+// }
 
 export const GET_BANNERS = async () => {
     return await API.get(`${prefix}/banners`);
