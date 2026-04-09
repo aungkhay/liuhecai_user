@@ -14,7 +14,7 @@
             <div v-if="lastRecordArr.length > 0" class="d-flex align-center justify-space-between bg-white my-2 mx-2 px-2 rounded-lg" @click="goHistory(currentRecordType)">
                 <div class="mr-2" style="min-width: 60px;">
                     <div class="font-weight-bold">{{ lastRecord?.batch_number }}期</div>
-                    <div class="text-red text-caption">开奖记录</div>
+                    <div class="text-red text-caption">{{ displayCountDown && currentRecordType == 'platform' ? countDown : '开奖记录' }}</div>
                 </div>
                 <div v-if="gettingLastRecord" style="min-height: 69.5px;" class="d-flex align-center justify-center">
                     <v-progress-circular indeterminate size="24" width="2" color="primary"></v-progress-circular>
@@ -22,18 +22,18 @@
                 <div v-else class="d-flex align-center my-3 overflow-x-auto">
                     <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="mr-1">
                         <div class="circle-wrapper">
-                            <v-img :src="getCircleBallImg(String(lastRecordArr[n - 1]?.desc))" width="33" height="33" cover/>
-                            <div class="circle-text">{{ String(lastRecordArr[n - 1]?.num).padStart(2, '0') }}</div>
+                            <v-img :src="getCircleBallImg(lastRecordArr[n - 1]?.desc)" width="33" height="33" cover/>
+                            <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[n - 1]?.num }}</div>
                         </div>
-                        <div class="text-caption text-center">{{ getZodiacName(String(lastRecordArr[n - 1]?.desc)) }}</div>
+                        <div class="text-caption text-center">{{ getZodiacName(lastRecordArr[n - 1]?.desc) }}</div>
                     </div>
                     <div v-if="lastRecordArr.length === 7"><v-icon size="small">mdi-plus</v-icon></div>
                     <div v-if="lastRecordArr.length === 7">
                         <div class="circle-wrapper mr-1">
-                            <v-img :src="getCircleBallImg(String(lastRecordArr[6]?.desc))" width="30" height="30" cover/>
-                            <div class="circle-text">{{ String(lastRecordArr[6]?.num).padStart(2, '0') }}</div>
+                            <v-img :src="getCircleBallImg(lastRecordArr[6]?.desc)" width="30" height="30" cover/>
+                            <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[6]?.num }}</div>
                         </div>
-                        <div class="text-caption text-center">{{ getZodiacName(String(lastRecordArr[6]?.desc)) }}</div>
+                        <div class="text-caption text-center" >{{ getZodiacName(lastRecordArr[6]?.desc) }}</div>
                     </div>
                 </div>
             </div>
@@ -243,6 +243,8 @@ const zodiacStore = useZodiacStore();
 const globalStore = useGlobalStore();
 
 const filePath = computed(() => globalStore.getFilePath);
+const serverTime = computed(() => globalStore.serverTime);
+const platformNextBatchNumber = computed(() => globalStore.platformNextBatchNumber);
 const xZodiacs = computed(() => zodiacStore.getxZodiacs);
 const currentYear = computed(() => zodiacStore.getCurrentYear);
 const wuxing = computed(() => zodiacStore.getWuXingNumbers);
@@ -266,13 +268,22 @@ const sanxiao = ref({});
 const touziPingTe = ref([]);
 const doubleColor = ref([]);
 const referenceLinks = ref([]);
+const displayCountDown = ref(false);
+const countDown = ref('');
+const countdownFinished = ref(false);
+const openHour = ref(22);
+const openMinute = ref(24);
 
-const getImg = (name) =>new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
+const getImg = (name) => new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
+    if (!num_desc) {
+        return new URL(`../assets/circle-ball/grey-circle.png`, import.meta.url).href;
+    }
     const color = num_desc.split('/')[2]
     return new URL(`../assets/circle-ball/${color}-circle.png`, import.meta.url).href;
 }
 const getZodiacName = (num_desc) => {
+    if (!num_desc) return '-';
     const desc = num_desc?.split('/');
     return desc[0];
 }
@@ -317,38 +328,140 @@ const getLastRecord = async (type) => {
     }, 500);
 };
 
+const prepareNextRecordDisplay = () => {
+    const serverDate = new Date(serverTime.value);
+    const serverHour = serverDate.getHours();
+    const serverMinute = serverDate.getMinutes();
+
+    if (
+        serverHour === openHour.value &&
+        serverMinute >= 0 &&
+        serverMinute <= openMinute.value
+    ) {
+        displayCountDown.value = true;
+
+        const countDownTarget = new Date(
+            new Date(serverTime.value).setHours(
+                openHour.value,
+                openMinute.value,
+                0,
+                0
+            )
+        ).getTime();
+
+        const now = serverDate.getTime();
+        const distance = countDownTarget - now;
+
+        if (distance <= 0) {
+            // ✅ prevent multiple calls
+            if (!countdownFinished.value) {
+                console.log('Countdown finished. Fetching last record...');
+                countdownFinished.value = true;
+
+                displayCountDown.value = false;
+                getLastRecord(currentRecordType.value);
+            }
+            return;
+        } else {
+            // ✅ reset flag if still counting
+            countdownFinished.value = false;
+
+            const minutes = Math.floor(
+                (distance % (1000 * 60 * 60)) / (1000 * 60)
+            );
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countDown.value = `${String(minutes).padStart(2, '0')}:${String(
+                seconds
+            ).padStart(2, '0')}`;
+        }
+    } else {
+        displayCountDown.value = false;
+        countdownFinished.value = false; // reset when outside window
+    }
+};
+
+watch(
+    () => serverTime.value,
+    (newVal) => {
+        if (newVal) {
+            if (displayCountDown.value) {
+                prepareNextRecordDisplay();
+            } else {
+                // Check if we should start the countdown when server time updates
+                const serverDate = new Date(newVal);
+                const serverHour = serverDate.getHours();
+                const serverMinute = serverDate.getMinutes();
+
+                if (
+                    currentRecordType.value === 'platform' &&
+                    serverHour === openHour.value &&
+                    serverMinute >= 0 &&
+                    serverMinute <= openMinute.value
+                ) {
+                    prepareNextRecordDisplay();
+                }
+            }
+        }
+    },
+    { immediate: true }
+)
+
 watch(
     () => lastRecord.value,
-    (newVal) => {
-        lastRecordArr.value = [];
-        const num1 = { num: newVal.num1, desc: newVal.num1_desc };
-        const num2 = { num: newVal.num2, desc: newVal.num2_desc };
-        const num3 = { num: newVal.num3, desc: newVal.num3_desc };
-        const num4 = { num: newVal.num4, desc: newVal.num4_desc };
-        const num5 = { num: newVal.num5, desc: newVal.num5_desc };
-        const num6 = { num: newVal.num6, desc: newVal.num6_desc };
-        const num7 = { num: newVal.num7, desc: newVal.num7_desc };
+    async (newVal) => {
+        if (!newVal.createdAt) return;
 
-        const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 35000; // 开奖时间+35秒
+        lastRecordArr.value = [];
+        lastRecordArr.value = [
+            { num: '01', desc: null },
+            { num: '02', desc: null },
+            { num: '03', desc: null },
+            { num: '04', desc: null },
+            { num: '05', desc: null },
+            { num: '06', desc: null },
+            { num: '07', desc: null },
+        ];
+        if (currentRecordType.value == 'platform' && displayCountDown.value) {
+            lastRecord.value.batch_number = platformNextBatchNumber.value;
+            return;
+        }
+
+        const num1 = { num: String(newVal.num1).padStart(2, '0'), desc: newVal.num1_desc };
+        const num2 = { num: String(newVal.num2).padStart(2, '0'), desc: newVal.num2_desc };
+        const num3 = { num: String(newVal.num3).padStart(2, '0'), desc: newVal.num3_desc };
+        const num4 = { num: String(newVal.num4).padStart(2, '0'), desc: newVal.num4_desc };
+        const num5 = { num: String(newVal.num5).padStart(2, '0'), desc: newVal.num5_desc };
+        const num6 = { num: String(newVal.num6).padStart(2, '0'), desc: newVal.num6_desc };
+        const num7 = { num: String(newVal.num7).padStart(2, '0'), desc: newVal.num7_desc };
+
+        const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 70000; // 开奖时间+70秒
         const timeNow = Date.now();
         
-        if (timeToDisplay >= timeNow) {
+        if (currentRecordType.value === 'platform' && timeToDisplay >= timeNow) {
+            let setIndex = 0;
             const interval = setInterval(() => {
                 const secondsPassed = Math.floor((Date.now() - new Date(newVal.createdAt).getTime()) / 1000);
-                for (let i = 1; i <= 7; i++) {
-                    if (i * 5 <= secondsPassed) {
-                        if (lastRecordArr.value.some(record => record.num === newVal[`num${i}`])) {
-                            continue;
+                console.log('Seconds passed since record creation:', secondsPassed);
+
+                // calculate setIndex based on secondsPassed by 10
+                setIndex = Math.floor(secondsPassed / 10);
+
+                if (secondsPassed > 0) {
+                    if (setIndex * 10 <= secondsPassed) {
+                        for (let i = 0; i < setIndex && i < 7; i++) {
+                            lastRecordArr.value[i] = eval(`num${i + 1}`);
                         }
-                        lastRecordArr.value.push(eval(`num${i}`));
+                        setIndex++;
+                    }
+                    if (secondsPassed >= 70) {
+                        clearInterval(interval);
                     }
                 }
-                if (secondsPassed >= 35) {
-                    clearInterval(interval);
-                }
+                
             }, 500);
         } else {
-            lastRecordArr.value.push(num1, num2, num3, num4, num5, num6, num7);
+            lastRecordArr.value = [num1, num2, num3, num4, num5, num6, num7];
         }
     },
     { immediate: true }

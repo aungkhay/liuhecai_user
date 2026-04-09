@@ -1,5 +1,6 @@
 import API from './axios';
 import { useZodiacStore } from '../stores/zodiac';
+import { useGlobalStore } from '../stores/global';
 
 const prefix = '/api';
 
@@ -10,6 +11,14 @@ const prefix = '/api';
 //         zodiacStore.setCurrentYear(res.data.year);
 //     }
 // }
+
+export const GET_SERVER_TIME = async () => {
+    const res = await API.get(`${prefix}/server-time`);
+    if (res.code === 1000) {
+        const globalStore = useGlobalStore();
+        globalStore.setServerTime(res.data.server_time);
+    }
+}
 
 export const GET_BANNERS = async () => {
     return await API.get(`${prefix}/banners`);
@@ -45,4 +54,12 @@ export const GET_DOUBLE_COLOR = async () => {
 
 export const GET_REFERENCE_LINK = async () => {
     return await API.get(`${prefix}/reference-links`);
+}
+
+export const PLATFORM_LAST_BATCH_NUMBER = async () => {
+    const res = await API.get(`${prefix}/platform-next-batch-number`);
+    if (res.code === 1000) {
+        const globalStore = useGlobalStore();
+        globalStore.setPlatformNextBatchNumber(res.data.next_batch_number);
+    }
 }
