@@ -271,8 +271,8 @@ const referenceLinks = ref([]);
 const displayCountDown = ref(false);
 const countDown = ref('');
 const countdownFinished = ref(false);
-const openHour = ref(22);
-const openMinute = ref(24);
+const openHour = ref(20);
+const openMinute = ref(33);
 
 const getImg = (name) => new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
