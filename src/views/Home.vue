@@ -470,7 +470,7 @@ watch(
 const getResultGuesses = async () => {
     const res = await GET_RESULT_GUESS();
     if (res.code === 1000) {
-        resultGuesses.value = res.data.reverse();
+        resultGuesses.value = res.data;
     }
 };
 
@@ -509,7 +509,7 @@ const getXiaoMa = async () => {
 const getTouziPingTe = async () => {
     const res = await GET_TOUZI_PING_TE();
     if (res.code === 1000) {
-        touziPingTe.value = res.data.reverse();
+        touziPingTe.value = res.data;
     }
 };
 
