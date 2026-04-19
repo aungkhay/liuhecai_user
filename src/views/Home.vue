@@ -132,6 +132,17 @@
                     </tbody>
                 </v-table>
             </div>
+
+            <div v-if="referenceImages.length > 0" class="mb-3">
+                <v-row dense>
+                    <v-col cols="6" v-for="(refImg, index) in referenceImages" :key="index">
+                        <div class="border rounded-lg pa-2">
+                            <v-img :src="filePath + refImg.image_url" height="100%" width="100%" cover></v-img>
+                            <div v-if="refImg.name" class="text-center font-weight-bold mt-2">{{ refImg.name }}</div>
+                        </div>
+                    </v-col>
+                </v-row>
+            </div>
             
             <div class="border rounded-lg">
                 <div class="text-center font-weight-bold text-h6 bg-grey-lighten-3 rounded-t-lg">{{ currentYear }}年（十二生肖号码对照）</div>
@@ -233,7 +244,7 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE, GET_DOUBLE_COLOR, GET_REFERENCE_LINK } from '../js/api';
+import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE, GET_DOUBLE_COLOR, GET_REFERENCE_LINK, REFERENCE_IMAGES } from '../js/api';
 import { useZodiacStore } from '../stores/zodiac';
 import router from '../routers';
 import Appbar from '../components/Appbar.vue';
@@ -268,6 +279,7 @@ const sanxiao = ref({});
 const touziPingTe = ref([]);
 const doubleColor = ref([]);
 const referenceLinks = ref([]);
+const referenceImages = ref([]);   
 const displayCountDown = ref(false);
 const countDown = ref('');
 const countdownFinished = ref(false);
@@ -527,6 +539,13 @@ const getReferenceLinks = async () => {
     }
 }
 
+const getReferenceImages = async () => {
+    const res = await REFERENCE_IMAGES();
+    if (res.code === 1000) {
+        referenceImages.value = res.data;
+    }
+}
+
 onMounted(async () => {
     zodiacStore.orderZodiac();
     getBanners();
@@ -536,6 +555,7 @@ onMounted(async () => {
     getTouziPingTe();
     getDoubleColor();
     getReferenceLinks();
+    getReferenceImages();
 });
 
 </script>

@@ -63,3 +63,7 @@ export const PLATFORM_LAST_BATCH_NUMBER = async () => {
         globalStore.setPlatformNextBatchNumber(res.data.next_batch_number);
     }
 }
+
+export const REFERENCE_IMAGES = async () => {
+    return await API.get(`${prefix}/reference-images`);
+}
