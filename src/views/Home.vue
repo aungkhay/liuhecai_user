@@ -133,17 +133,6 @@
                 </v-table>
             </div>
 
-            <div v-if="referenceImages.length > 0" class="mb-3">
-                <v-row dense>
-                    <v-col cols="6" v-for="(refImg, index) in referenceImages" :key="index">
-                        <div class="border rounded-lg pa-2">
-                            <v-img :src="filePath + refImg.image_url" height="100%" width="100%" cover></v-img>
-                            <div v-if="refImg.name" class="text-center font-weight-bold mt-2">{{ refImg.name }}</div>
-                        </div>
-                    </v-col>
-                </v-row>
-            </div>
-
             <div v-if="zodiacFeeds.length > 0" class="border rounded-lg mb-3">
                 <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">草菜肉肖</div>
                 <v-table>
@@ -165,6 +154,17 @@
                         </tr>
                     </tbody>
                 </v-table>
+            </div>
+
+            <div v-if="referenceImages.length > 0" class="mb-3">
+                <v-row dense>
+                    <v-col cols="6" v-for="(refImg, index) in referenceImages" :key="index">
+                        <div class="border rounded-lg pa-2">
+                            <v-img :src="filePath + refImg.image_url" height="100%" width="100%" cover></v-img>
+                            <div v-if="refImg.name" class="text-center font-weight-bold mt-2">{{ refImg.name }}</div>
+                        </div>
+                    </v-col>
+                </v-row>
             </div>
             
             <div class="border rounded-lg">
