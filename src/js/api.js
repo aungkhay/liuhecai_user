@@ -67,3 +67,7 @@ export const PLATFORM_LAST_BATCH_NUMBER = async () => {
 export const REFERENCE_IMAGES = async () => {
     return await API.get(`${prefix}/reference-images`);
 }
+
+export const ZODIAC_FEED = async () => {
+    return await API.get(`${prefix}/zodiac-feed`);
+}

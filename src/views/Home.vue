@@ -79,11 +79,11 @@
                 <v-table>
                     <tbody>
                         <tr>
-                            <td class="font-weight-bold">七消:<span class="text-red">{{ qixiao?.xiaos?.join('') }}</span></td>
+                            <td class="font-weight-bold">七肖:<span class="text-red">{{ qixiao?.xiaos?.join('') }}</span></td>
                             <td class="font-weight-bold">7码:<span class="text-red">{{ qixiao?.numbers?.join('.') }}</span></td>
                         </tr>
                         <tr>
-                            <td class="font-weight-bold">五消:<span class="text-red">{{ wuxiao?.xiaos?.join('') }}</span></td>
+                            <td class="font-weight-bold">五肖:<span class="text-red">{{ wuxiao?.xiaos?.join('') }}</span></td>
                             <td class="font-weight-bold">5码:<span class="text-red">{{ wuxiao?.numbers?.join('.') }}</span></td>
                         </tr>
                         <tr>
@@ -142,6 +142,29 @@
                         </div>
                     </v-col>
                 </v-row>
+            </div>
+
+            <div v-if="zodiacFeeds.length > 0" class="border rounded-lg mb-3">
+                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">草菜肉肖</div>
+                <v-table>
+                    <tbody>
+                        <tr v-for="(item, index) in zodiacFeeds" :key="index">
+                            <td>
+                                <div class="text-h6 font-weight-bold">
+                                    {{ `${String(item.batch_number).padStart(3, '0')}期:` }}
+                                    <span class="text-red">
+                                        【<span :class="{'bg-amber': zodiacFeedMap[feedMap[item.feed_one]].includes(item.result_zodiac_name)}">{{ feedMap[item.feed_one] }}</span>+<span :class="{'bg-amber': zodiacFeedMap[feedMap[item.feed_two]].includes(item.result_zodiac_name)}">{{ feedMap[item.feed_two] }}</span>】
+                                    </span>
+                                    <span>开:
+                                        <span v-if="item.result_number == 0">?</span>
+                                        <span v-else class="text-blue">{{ item.result_zodiac_name }}{{ String(item.result_number).padStart(2, '0') }}</span>
+                                        <span v-if="zodiacFeedMap[feedMap[item.feed_one]].includes(item.result_zodiac_name) || zodiacFeedMap[feedMap[item.feed_two]].includes(item.result_zodiac_name)">准</span>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </v-table>
             </div>
             
             <div class="border rounded-lg">
@@ -244,7 +267,7 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE, GET_DOUBLE_COLOR, GET_REFERENCE_LINK, REFERENCE_IMAGES } from '../js/api';
+import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE, GET_DOUBLE_COLOR, GET_REFERENCE_LINK, REFERENCE_IMAGES, ZODIAC_FEED } from '../js/api';
 import { useZodiacStore } from '../stores/zodiac';
 import router from '../routers';
 import Appbar from '../components/Appbar.vue';
@@ -279,12 +302,13 @@ const sanxiao = ref({});
 const touziPingTe = ref([]);
 const doubleColor = ref([]);
 const referenceLinks = ref([]);
-const referenceImages = ref([]);   
+const referenceImages = ref([]);  
+const zodiacFeeds = ref([]); 
 const displayCountDown = ref(false);
 const countDown = ref('');
 const countdownFinished = ref(false);
-const openHour = ref(20);
-const openMinute = ref(33);
+const openHour = ref(21);
+const openMinute = ref(16);
 
 const getImg = (name) => new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
@@ -316,6 +340,16 @@ const oddEvenMap = {
     'odd': '合数单',
     'even': '合数双'
 };
+const feedMap = {
+    1: '草',
+    2: '肉',
+    3: '菜'
+}
+const zodiacFeedMap = {
+    '草': ['牛', '羊', '马', '兔'],
+    '肉': ['虎', '蛇', '龙', '狗'],
+    '菜': ['猪', '鼠', '鸡', '猴']
+}
 
 const getBanners = async () => {
     const res = await GET_BANNERS();
@@ -546,6 +580,13 @@ const getReferenceImages = async () => {
     }
 }
 
+const getZodiacFeeds = async () => {
+    const res = await ZODIAC_FEED();
+    if (res.code === 1000) {
+        zodiacFeeds.value = res.data;
+    }
+}
+
 onMounted(async () => {
     zodiacStore.orderZodiac();
     getBanners();
@@ -556,6 +597,7 @@ onMounted(async () => {
     getDoubleColor();
     getReferenceLinks();
     getReferenceImages();
+    getZodiacFeeds();
 });
 
 </script>
