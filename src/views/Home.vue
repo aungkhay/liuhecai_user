@@ -162,6 +162,8 @@
                 </v-table>
             </div>
 
+            <MustWin3Batch />
+
             <div v-if="referenceImages.length > 0" class="mb-3">
                 <v-row dense>
                     <v-col cols="6" v-for="(refImg, index) in referenceImages" :key="index">
@@ -278,6 +280,7 @@ import { useZodiacStore } from '../stores/zodiac';
 import router from '../routers';
 import Appbar from '../components/Appbar.vue';
 import { useGlobalStore } from '../stores/global';
+import MustWin3Batch from '../components/home/MustWin3Batch.vue';
 
 const zodiacStore = useZodiacStore();
 const globalStore = useGlobalStore();

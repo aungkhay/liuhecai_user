@@ -71,3 +71,7 @@ export const REFERENCE_IMAGES = async () => {
 export const ZODIAC_FEED = async () => {
     return await API.get(`${prefix}/zodiac-feed`);
 }
+
+export const MUST_WIN_3_BATCH = async () => {
+    return await API.get(`${prefix}/must-win-3-batches`);
+}
