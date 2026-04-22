@@ -11,31 +11,34 @@
                     </v-col>
                 </v-row>
             </v-card>
-            <div v-if="lastRecordArr.length > 0" class="d-flex align-center justify-space-between bg-white my-2 mx-2 px-2 rounded-lg" @click="goHistory(currentRecordType)">
-                <div class="mr-2" style="min-width: 60px;">
-                    <div class="font-weight-bold">{{ lastRecord?.batch_number }}期</div>
-                    <div class="text-red text-caption">{{ displayCountDown && currentRecordType == 'platform' ? countDown : '开奖记录' }}</div>
-                </div>
-                <div v-if="gettingLastRecord" style="min-height: 69.5px;" class="d-flex align-center justify-center">
-                    <v-progress-circular indeterminate size="24" width="2" color="primary"></v-progress-circular>
-                </div>
-                <div v-else class="d-flex align-center my-3 overflow-x-auto">
-                    <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="mr-1">
-                        <div class="circle-wrapper">
-                            <v-img :src="getCircleBallImg(lastRecordArr[n - 1]?.desc)" width="33" height="33" cover/>
-                            <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[n - 1]?.num }}</div>
-                        </div>
-                        <div class="text-caption text-center">{{ getZodiacName(lastRecordArr[n - 1]?.desc) }}</div>
+            <div v-if="lastRecordArr.length > 0" class="bg-white my-2 mx-2 px-2 rounded-lg">
+                <div  class="d-flex align-center justify-space-between" @click="displayCountDown ? {} : goHistory(currentRecordType)">
+                    <div class="mr-2" style="min-width: 60px;">
+                        <div class="font-weight-bold">{{ lastRecord?.batch_number }}期</div>
+                        <div class="text-red text-caption">{{ displayCountDown && currentRecordType == 'platform' ? countDown : '开奖记录' }}</div>
                     </div>
-                    <div v-if="lastRecordArr.length === 7"><v-icon size="small">mdi-plus</v-icon></div>
-                    <div v-if="lastRecordArr.length === 7">
-                        <div class="circle-wrapper mr-1">
-                            <v-img :src="getCircleBallImg(lastRecordArr[6]?.desc)" width="30" height="30" cover/>
-                            <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[6]?.num }}</div>
+                    <div v-if="gettingLastRecord" style="min-height: 69.5px;" class="d-flex align-center justify-center">
+                        <v-progress-circular indeterminate size="24" width="2" color="primary"></v-progress-circular>
+                    </div>
+                    <div v-else class="d-flex align-center my-3 overflow-x-auto">
+                        <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="mr-1">
+                            <div class="circle-wrapper">
+                                <v-img :src="getCircleBallImg(lastRecordArr[n - 1]?.desc)" width="33" height="33" cover/>
+                                <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[n - 1]?.num }}</div>
+                            </div>
+                            <div class="text-caption text-center">{{ getZodiacName(lastRecordArr[n - 1]?.desc) }}</div>
                         </div>
-                        <div class="text-caption text-center" >{{ getZodiacName(lastRecordArr[6]?.desc) }}</div>
+                        <div v-if="lastRecordArr.length === 7"><v-icon size="small">mdi-plus</v-icon></div>
+                        <div v-if="lastRecordArr.length === 7">
+                            <div class="circle-wrapper mr-1">
+                                <v-img :src="getCircleBallImg(lastRecordArr[6]?.desc)" width="30" height="30" cover/>
+                                <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[6]?.num }}</div>
+                            </div>
+                            <div class="text-caption text-center" >{{ getZodiacName(lastRecordArr[6]?.desc) }}</div>
+                        </div>
                     </div>
                 </div>
+                <div v-if="currentRecordType == 'platform' && displayOpenTimeString" class="text-red font-weight-semibold" style="font-size: 15px;">{{ openTimeString }}</div>
             </div>
         </div>
 
@@ -74,6 +77,25 @@
                     </tbody>
                 </v-table>
             </div>
+            
+            <div class="border rounded-lg mb-3">
+                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">他不准我哭【投资平特】</div>
+                <v-table>
+                    <tbody>
+                        <tr v-for="(item, index) in touziPingTe" :key="index">
+                            <td>
+                                <div class="text-h6 font-weight-bold">
+                                    {{ `${String(item.batch_start).padStart(3, '0')}-${String(item.batch_end).padStart(3, '0')}期:` }}
+                                    <span class="text-red">【{{ item.zodiac_name }}{{ item.zodiac_name }}】</span>
+                                    <span v-if="item.is_finished">开({{ item.open_count }}期)</span>
+                                    <span v-else>开({{ item.open_count > 0 ? item.open_count : '?' }}期)</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </v-table>
+            </div>
+
             <div class="border rounded-lg mb-3">
                 <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">给你一期内幕,也要懂得下注</div>
                 <v-table>
@@ -93,23 +115,7 @@
                     </tbody>
                 </v-table>
             </div>
-            <div class="border rounded-lg mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">他不准我哭【投资平特】</div>
-                <v-table>
-                    <tbody>
-                        <tr v-for="(item, index) in touziPingTe" :key="index">
-                            <td>
-                                <div class="text-h6 font-weight-bold">
-                                    {{ `${String(item.batch_start).padStart(3, '0')}-${String(item.batch_end).padStart(3, '0')}期:` }}
-                                    <span class="text-red">【{{ item.zodiac_name }}{{ item.zodiac_name }}】</span>
-                                    <span v-if="item.is_finished">开({{ item.open_count }}期)</span>
-                                    <span v-else>开({{ item.open_count > 0 ? item.open_count : '?' }}期)</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </v-table>
-            </div>
+            
             <div class="border rounded-lg mb-3">
                 <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">大神双波</div>
                 <v-table>
@@ -309,6 +315,8 @@ const countDown = ref('');
 const countdownFinished = ref(false);
 const openHour = ref(21);
 const openMinute = ref(16);
+const openTimeString = ref('');
+const displayOpenTimeString = ref(false);
 
 const getImg = (name) => new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
@@ -368,6 +376,7 @@ const getLastRecord = async (type) => {
     const res = await GET_LAST_RECORD(type);
     if (res.code === 1000) {
         lastRecord.value = res.data;
+        formatOpenTimeString();
     }
     setTimeout(() => {
         gettingLastRecord.value = false;
@@ -584,6 +593,27 @@ const getZodiacFeeds = async () => {
     const res = await ZODIAC_FEED();
     if (res.code === 1000) {
         zodiacFeeds.value = res.data;
+    }
+}
+
+const formatOpenTimeString = () => {
+    // format: 第xxx期 2026/04/22 星期三 21:15
+    if (!lastRecord.value.createdAt) return;
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const weekdayMap = ['日', '一', '二', '三', '四', '五', '六'];
+    const weekday = weekdayMap[date.getDay()];
+    openTimeString.value = `第${Number(platformNextBatchNumber.value)}期 ${year}/${month}/${day} 星期${weekday} 21:15`;
+
+    // display between 8:00 AM and 9:15 PM
+    const currentHour = date.getHours();
+    const currentMinute = date.getMinutes();
+    if (currentHour >= 8 && (currentHour < 21 || (currentHour === 21 && currentMinute <= 15))) {
+        displayOpenTimeString.value = true;
+    } else {
+        displayOpenTimeString.value = false;
     }
 }
 
