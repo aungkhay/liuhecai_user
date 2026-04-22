@@ -22,9 +22,9 @@
                     </td>
                     <td>
                         <div class="text-h6 font-weight-bold">
-                            <div>开:<span class="text-red" :class="{ 'bg-amber': checkMatch(item, 1) }" v-if="item.result_number_one">{{ item.result_zodiac_one }}{{ item.result_number_one }}</span><span v-else>?</span></div>
-                            <div>开:<span class="text-red" :class="{ 'bg-amber': checkMatch(item, 2) }" v-if="item.result_number_two">{{ item.result_zodiac_two }}{{ item.result_number_two }}</span><span v-else>?</span></div>
-                            <div>开:<span class="text-red" :class="{ 'bg-amber': checkMatch(item, 3) }" v-if="item.result_number_three">{{ item.result_zodiac_three }}{{ item.result_number_three }}</span><span v-else>?</span></div>
+                            <div>开:<span class="text-red" :class="{ 'bg-amber': checkMatch(item, 1) }" v-if="item.result_number_one">{{ item.result_zodiac_one }}{{ String(item.result_number_one).padStart(2, '0') }}</span><span v-else>?</span></div>
+                            <div>开:<span class="text-red" :class="{ 'bg-amber': checkMatch(item, 2) }" v-if="item.result_number_two">{{ item.result_zodiac_two }}{{ String(item.result_number_two).padStart(2, '0') }}</span><span v-else>?</span></div>
+                            <div>开:<span class="text-red" :class="{ 'bg-amber': checkMatch(item, 3) }" v-if="item.result_number_three">{{ item.result_zodiac_three }}{{ String(item.result_number_three).padStart(2, '0') }}</span><span v-else>?</span></div>
                         </div>
                     </td>
                 </tr>

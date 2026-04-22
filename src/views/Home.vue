@@ -613,7 +613,12 @@ const formatOpenTimeString = () => {
     // display between 8:00 AM and 9:15 PM
     const currentHour = date.getHours();
     const currentMinute = date.getMinutes();
-    if (currentHour >= 8 && (currentHour < 21 || (currentHour === 21 && currentMinute <= 15))) {
+
+    // check lastRecord's createdAt time, if it's today, then use that time to determine whether to display openTimeString
+    const lastRecordDate = new Date(lastRecord.value.createdAt);
+    const isToday = date.toDateString() === lastRecordDate.toDateString();
+
+    if (currentHour >= 0 && (currentHour < 21 || (currentHour === 21 && currentMinute <= 15)) && !isToday) {
         displayOpenTimeString.value = true;
     } else {
         displayOpenTimeString.value = false;
