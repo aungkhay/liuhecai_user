@@ -2,7 +2,9 @@ import { defineStore } from 'pinia'
 
 export const useGlobalStore = defineStore('global', {
     state: () => ({
-        filePath: import.meta.env.VITE_FILE_PATH || '',
+        // filePath: import.meta.env.VITE_FILE_PATH || '',
+        // domain name
+        filePath: location.origin,
         serverTime: null,
         platformNextBatchNumber: null,
     }),
