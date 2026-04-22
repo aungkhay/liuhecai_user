@@ -163,6 +163,7 @@
             </div>
 
             <MustWin3Batch />
+            <TenWinSpecial />
 
             <div v-if="referenceImages.length > 0" class="mb-3">
                 <v-row dense>
@@ -281,6 +282,7 @@ import router from '../routers';
 import Appbar from '../components/Appbar.vue';
 import { useGlobalStore } from '../stores/global';
 import MustWin3Batch from '../components/home/MustWin3Batch.vue';
+import TenWinSpecial from '../components/home/TenWinSpecial.vue';
 
 const zodiacStore = useZodiacStore();
 const globalStore = useGlobalStore();

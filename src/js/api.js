@@ -75,3 +75,7 @@ export const ZODIAC_FEED = async () => {
 export const MUST_WIN_3_BATCH = async () => {
     return await API.get(`${prefix}/must-win-3-batches`);
 }
+
+export const TEN_WIN_SPECIAL = async () => {
+    return await API.get(`${prefix}/ten-win-special`);
+}
