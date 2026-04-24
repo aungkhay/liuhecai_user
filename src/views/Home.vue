@@ -451,6 +451,15 @@ watch(
     () => serverTime.value,
     (newVal) => {
         if (newVal) {
+            const serverDate = new Date(newVal);
+            const serverHour = serverDate.getHours();
+            const serverMinute = serverDate.getMinutes();
+            const serverSecond = serverDate.getSeconds();
+            // reload when server time is 21:15:15
+            if (serverHour == openHour.value && serverMinute == openMinute.value && serverSecond == 15) {
+                location.reload();
+            }
+        
             if (displayCountDown.value) {
                 prepareNextRecordDisplay();
             } else {
