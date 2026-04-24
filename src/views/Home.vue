@@ -140,7 +140,10 @@
             </div>
 
             <div v-if="zodiacFeeds.length > 0" class="border rounded-lg mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">草菜肉肖</div>
+                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">
+                    <div>草菜肉肖</div>
+                    <div style="font-size: 1rem;"><span class="text-amber">吃草:牛羊马兔</span> <span class="text-purple">吃肉:虎蛇龙狗</span> <span class="text-error">吃菜:猪鼠鸡猴</span></div>
+                </div>
                 <v-table>
                     <tbody>
                         <tr v-for="(item, index) in zodiacFeeds" :key="index">
@@ -297,7 +300,7 @@ const colors = computed(() => zodiacStore.getColorNumbers);
 const oddEvens = computed(() => zodiacStore.getOddEvenNumbers);
 const attributes = computed(() => zodiacStore.getAttributes);
 const recordType = ref([
-    { label: '奥博彩', value: 'platform' }, 
+    { label: '澳博彩', value: 'platform' }, 
     { label: '澳门六合彩', value: 'aomen' }, 
     { label: '香港六合彩', value: 'hongkong' }
 ]);
@@ -319,7 +322,7 @@ const displayCountDown = ref(false);
 const countDown = ref('');
 const countdownFinished = ref(false);
 const openHour = ref(21);
-const openMinute = ref(16);
+const openMinute = ref(15);
 const openTimeString = ref('');
 const displayOpenTimeString = ref(false);
 
@@ -418,8 +421,11 @@ const prepareNextRecordDisplay = () => {
                 console.log('Countdown finished. Fetching last record...');
                 countdownFinished.value = true;
 
-                displayCountDown.value = false;
-                getLastRecord(currentRecordType.value);
+                setTimeout(() => {
+                    displayCountDown.value = false;
+                    getLastRecord(currentRecordType.value);
+                    location.reload(); // reload to reset any potential state issues
+                }, 15000);
             }
             return;
         } else {
@@ -482,6 +488,7 @@ watch(
             { num: '06', desc: null },
             { num: '07', desc: null },
         ];
+        console.log(displayCountDown.value)
         if (currentRecordType.value == 'platform' && displayCountDown.value) {
             lastRecord.value.batch_number = platformNextBatchNumber.value;
             return;
@@ -497,6 +504,7 @@ watch(
 
         const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 70000; // 开奖时间+70秒
         const timeNow = Date.now();
+        console.log(timeToDisplay, timeNow)
         
         if (currentRecordType.value === 'platform' && timeToDisplay >= timeNow) {
             let setIndex = 0;
@@ -610,7 +618,7 @@ const formatOpenTimeString = () => {
     const day = String(date.getDate()).padStart(2, '0');
     const weekdayMap = ['日', '一', '二', '三', '四', '五', '六'];
     const weekday = weekdayMap[date.getDay()];
-    openTimeString.value = `第${Number(platformNextBatchNumber.value)}期 ${year}/${month}/${day} 星期${weekday} 21:15`;
+    openTimeString.value = `第${Number(platformNextBatchNumber.value)}期 ${year}/${month}/${day} 星期${weekday} ${openHour.value}:${openMinute.value}`;
 
     // display between 8:00 AM and 9:15 PM
     const currentHour = date.getHours();

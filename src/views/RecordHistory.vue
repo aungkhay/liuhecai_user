@@ -70,7 +70,7 @@ const perPage = ref(10);
 const total = ref(0);
 const totalPage = ref(0);
 const recordType = ref([
-    { label: '奥博彩', value: 'platform' }, 
+    { label: '澳博彩', value: 'platform' }, 
     { label: '澳门六合彩', value: 'aomen' }, 
     { label: '香港六合彩', value: 'hongkong' }
 ]);
