@@ -321,8 +321,8 @@ const zodiacFeeds = ref([]);
 const displayCountDown = ref(false);
 const countDown = ref('');
 const countdownFinished = ref(false);
-const openHour = ref(21);
-const openMinute = ref(15);
+const openHour = ref(20);
+const openMinute = ref(30);
 const openTimeString = ref('');
 const displayOpenTimeString = ref(false);
 
