@@ -70,8 +70,8 @@
                                 <span>{{ `${result.batch_number.padStart(3, '0')}期:` }}</span>
                                 <span class="text-red">【{{ result.zodiac_attr }}】</span>
                                 <span v-if="result.result_match == 0">开:?</span>
-                                <span v-if="result.result_match == 1">开:<span class="text-red">{{ `${String(result.result_number).padStart(2, '0')}${result.zodiac_name}` }}</span>准</span>
-                                <span v-if="result.result_match == 2">开:<span class="text-red">{{ `${String(result.result_number).padStart(2, '0')}${result.zodiac_name}` }}</span>不准</span>
+                                <span v-if="result.result_match == 1">开:<span class="text-red">{{ `${String(result.result_number).padStart(2, '0')}${result.zodiac_name}` }}</span>对</span>
+                                <span v-if="result.result_match == 2">开:<span class="text-red">{{ `${String(result.result_number).padStart(2, '0')}${result.zodiac_name}` }}</span>错</span>
                             </td>
                         </tr>
                     </tbody>
@@ -130,7 +130,7 @@
                                     <span>开:
                                         <span v-if="item.result_number == 0">?</span>
                                         <span v-else class="text-blue">{{ item.zodiac_name }}{{ String(item.result_number).padStart(2, '0') }}</span>
-                                        <span v-if="item.match_color == item.color_one || item.match_color == item.color_two">准</span>
+                                        <span v-if="item.match_color == item.color_one || item.match_color == item.color_two">对</span>
                                     </span>
                                 </div>
                             </td>
@@ -156,7 +156,7 @@
                                     <span>开:
                                         <span v-if="item.result_number == 0">?</span>
                                         <span v-else class="text-blue">{{ item.result_zodiac_name }}{{ String(item.result_number).padStart(2, '0') }}</span>
-                                        <span v-if="zodiacFeedMap[feedMap[item.feed_one]].includes(item.result_zodiac_name) || zodiacFeedMap[feedMap[item.feed_two]].includes(item.result_zodiac_name)">准</span>
+                                        <span v-if="zodiacFeedMap[feedMap[item.feed_one]].includes(item.result_zodiac_name) || zodiacFeedMap[feedMap[item.feed_two]].includes(item.result_zodiac_name)">对</span>
                                     </span>
                                 </div>
                             </td>

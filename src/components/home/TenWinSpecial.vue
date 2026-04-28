@@ -10,7 +10,7 @@
                             <div>开:
                                 <span class="text-red" v-if="item.result_number">{{ item.result_zodiac }}{{ String(item.result_number).padStart(2, '0') }}</span>
                                 <span v-else>?</span>
-                                <span v-if="item.result_number && item.is_matched">准</span>
+                                <span v-if="item.result_number && item.is_matched">对</span>
                             </div>
                         </div>
                         <div class="text-h6 text-success">【{{ item.numbers.replace(/-/g, ' ') }}】</div>
