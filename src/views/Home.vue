@@ -28,7 +28,7 @@
                         <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="mr-1">
                             <div class="circle-wrapper">
                                 <v-img :src="getCircleBallImg(lastRecordArr[n - 1]?.desc)" width="40" height="40" cover/>
-                                <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[n - 1]?.num }}</div>
+                                <div class="circle-text text-caption" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[n - 1]?.num }}</div>
                             </div>
                             <div class="text-center">{{ getZodiacName(lastRecordArr[n - 1]?.desc) }}</div>
                         </div>
@@ -36,7 +36,7 @@
                         <div v-if="lastRecordArr.length === 7">
                             <div class="circle-wrapper mr-1">
                                 <v-img :src="getCircleBallImg(lastRecordArr[6]?.desc)" width="40" height="40" cover/>
-                                <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[6]?.num }}</div>
+                                <div class="circle-text text-caption" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[6]?.num }}</div>
                             </div>
                             <div class="text-center" >{{ getZodiacName(lastRecordArr[6]?.desc) }}</div>
                         </div>
@@ -340,7 +340,7 @@ const displayCountDown = ref(false);
 const countDown = ref('');
 const countdownFinished = ref(false);
 const openHour = ref(20);
-const openMinute = ref(30);
+const openMinute = ref(32);
 const openTimeString = ref('');
 const displayOpenTimeString = ref(false);
 const previewImageDialog = ref(false);
@@ -531,7 +531,7 @@ watch(
         const num6 = { num: String(newVal.num6).padStart(2, '0'), desc: newVal.num6_desc };
         const num7 = { num: String(newVal.num7).padStart(2, '0'), desc: newVal.num7_desc };
 
-        const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 70000; // 开奖时间+70秒
+        const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 120000; // 开奖时间+120秒
         const timeNow = Date.now();
         console.log(timeToDisplay, timeNow)
         
@@ -541,8 +541,8 @@ watch(
                 const secondsPassed = Math.floor((Date.now() - new Date(newVal.createdAt).getTime()) / 1000);
                 console.log('Seconds passed since record creation:', secondsPassed);
 
-                // calculate setIndex based on secondsPassed by 10
-                setIndex = Math.floor(secondsPassed / 10);
+                // calculate setIndex based on secondsPassed by 17 seconds, so that every 17 seconds, a new number is revealed
+                setIndex = Math.floor(secondsPassed / 17);
 
                 if (secondsPassed > 0) {
                     if (setIndex * 10 <= secondsPassed) {
@@ -551,7 +551,7 @@ watch(
                         }
                         setIndex++;
                     }
-                    if (secondsPassed >= 70) {
+                    if (secondsPassed >= 120) {
                         clearInterval(interval);
                     }
                 }
