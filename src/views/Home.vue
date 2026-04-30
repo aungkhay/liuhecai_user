@@ -5,36 +5,40 @@
             <v-card elevation="0" class="bg-transparent">
                 <v-row dense class="px-2">
                     <v-col cols="4" v-for="(type, index) in recordType" :key="index">
-                        <v-btn block flat @click="getLastRecord(type.value)">
+                        <v-btn block size="large" flat @click="getLastRecord(type.value)">
                             <span :class="currentRecordType == type.value ? 'font-weight-bold text-primary' : ''">{{ type.label }}</span>
                         </v-btn>
                     </v-col>
                 </v-row>
             </v-card>
             <div v-if="lastRecordArr.length > 0" class="bg-white my-2 mx-2 px-2 rounded-lg">
+                <div class="d-flex align-center justify-space-between pt-1">
+                    <div class="font-weight-bold">{{ lastRecord?.batch_number }}期</div>
+                    <div class="text-red text-caption">{{ displayCountDown && currentRecordType == 'platform' ? countDown : '开奖记录' }}</div>
+                </div>
                 <div  class="d-flex align-center justify-space-between" @click="displayCountDown ? {} : goHistory(currentRecordType)">
-                    <div class="mr-2" style="min-width: 60px;">
+                    <!-- <div class="mr-2" style="min-width: 60px;">
                         <div class="font-weight-bold">{{ lastRecord?.batch_number }}期</div>
                         <div class="text-red text-caption">{{ displayCountDown && currentRecordType == 'platform' ? countDown : '开奖记录' }}</div>
-                    </div>
+                    </div> -->
                     <div v-if="gettingLastRecord" style="min-height: 69.5px;" class="d-flex align-center justify-center">
                         <v-progress-circular indeterminate size="24" width="2" color="primary"></v-progress-circular>
                     </div>
-                    <div v-else class="d-flex align-center my-3 overflow-x-auto">
+                    <div v-else class="d-flex align-center justify-center my-1 overflow-x-auto w-100">
                         <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="mr-1">
                             <div class="circle-wrapper">
-                                <v-img :src="getCircleBallImg(lastRecordArr[n - 1]?.desc)" width="33" height="33" cover/>
+                                <v-img :src="getCircleBallImg(lastRecordArr[n - 1]?.desc)" width="40" height="40" cover/>
                                 <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[n - 1]?.num }}</div>
                             </div>
-                            <div class="text-caption text-center">{{ getZodiacName(lastRecordArr[n - 1]?.desc) }}</div>
+                            <div class="text-center">{{ getZodiacName(lastRecordArr[n - 1]?.desc) }}</div>
                         </div>
                         <div v-if="lastRecordArr.length === 7"><v-icon size="small">mdi-plus</v-icon></div>
                         <div v-if="lastRecordArr.length === 7">
                             <div class="circle-wrapper mr-1">
-                                <v-img :src="getCircleBallImg(lastRecordArr[6]?.desc)" width="30" height="30" cover/>
+                                <v-img :src="getCircleBallImg(lastRecordArr[6]?.desc)" width="40" height="40" cover/>
                                 <div class="circle-text" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[6]?.num }}</div>
                             </div>
-                            <div class="text-caption text-center" >{{ getZodiacName(lastRecordArr[6]?.desc) }}</div>
+                            <div class="text-center" >{{ getZodiacName(lastRecordArr[6]?.desc) }}</div>
                         </div>
                     </div>
                 </div>
@@ -171,7 +175,7 @@
             <div v-if="referenceImages.length > 0" class="mb-3">
                 <v-row dense>
                     <v-col cols="6" v-for="(refImg, index) in referenceImages" :key="index">
-                        <div class="border rounded-lg pa-2">
+                        <div class="border rounded-lg pa-2" @click="previewImageSrc = filePath + refImg.image_url; previewImageDialog = true" style="cursor: pointer;">
                             <v-img :src="filePath + refImg.image_url" height="100%" width="100%" cover></v-img>
                             <div v-if="refImg.name" class="text-center font-weight-bold mt-2">{{ refImg.name }}</div>
                         </div>
@@ -274,6 +278,20 @@
                 </div>
             </div>
         </div>
+
+        <v-dialog v-model="previewImageDialog" transition="dialog-bottom-transition" fullscreen>
+            <v-card>
+                <v-toolbar dark color="primary">
+                    <v-btn icon @click="previewImageDialog = false">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-toolbar-title>图片预览</v-toolbar-title>
+                </v-toolbar>
+                <v-card-text class="d-flex align-center justify-center pa-0" style="height: 100%;">
+                    <v-img :src="previewImageSrc" max-width="100%" max-height="100%" contain></v-img>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -325,6 +343,8 @@ const openHour = ref(20);
 const openMinute = ref(30);
 const openTimeString = ref('');
 const displayOpenTimeString = ref(false);
+const previewImageDialog = ref(false);
+const previewImageSrc = ref('');
 
 const getImg = (name) => new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
@@ -337,7 +357,7 @@ const getCircleBallImg = (num_desc) => {
 const getZodiacName = (num_desc) => {
     if (!num_desc) return '-';
     const desc = num_desc?.split('/');
-    return desc[0];
+    return desc[0] + '/' + desc[1];
 }
 
 const wuxingMap = {
@@ -662,8 +682,8 @@ onMounted(async () => {
 <style scoped>
 .circle-wrapper {
     position: relative;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
 }
 
 .circle-text {
@@ -672,18 +692,18 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 14px;
+    /* font-weight: bold; */
+    font-size: 22px;
     z-index: 2;
 }
 
 @media screen and (max-width: 360px) {
     .circle-wrapper {
-        width: 25px;
-        height: 25px;
+        width: 33px;
+        height: 33px;
     }
     .circle-text {
-        font-size: 11px;
+        font-size: 16px;
     }
 }
 </style>
