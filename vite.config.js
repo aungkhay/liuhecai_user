@@ -20,7 +20,7 @@ export default defineConfig({
     host: true, // ************  npm run dev -- --host ************
     proxy: {
         '/api': {
-            target: 'http://127.0.0.1:2590/api',
+            target: 'http://203.91.74.188:3690/api',
             changeOrigin: true,
             ws: true,
             rewrite: (path) => path.replace(/^\/api/, '')

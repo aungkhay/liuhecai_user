@@ -55,121 +55,12 @@
         </v-carousel>
 
         <div class="pa-2">
-            <div v-if="referenceLinks.length" class="border rounded-lg mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">参考链接</div>
-                <div class="my-1">
-                    <div v-for="(refLink, index) in referenceLinks" :key="index" class="px-2 py-1">
-                        <a :href="refLink.url" target="_blank">
-                            <v-img :src="filePath + refLink.image" width="100%" height="60" cover class="rounded-lg"></v-img>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="border rounded-lg mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">发什么开什么</div>
-                <v-table>
-                    <tbody>
-                        <tr v-for="(result, index) in resultGuesses" :key="index">
-                            <td class="text-h6 font-weight-bold">
-                                <span>{{ `${result.batch_number.padStart(3, '0')}期:` }}</span>
-                                <span class="text-red">【{{ result.zodiac_attr }}】</span>
-                                <span v-if="result.result_match == 0">开:?</span>
-                                <span v-if="result.result_match == 1">开:<span class="text-red">{{ `${String(result.result_number).padStart(2, '0')}${result.zodiac_name}` }}</span>对</span>
-                                <span v-if="result.result_match == 2">开:<span class="text-red">{{ `${String(result.result_number).padStart(2, '0')}${result.zodiac_name}` }}</span>错</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </v-table>
-            </div>
-            
-            <div class="border rounded-lg mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">他不准我哭【投资平特】</div>
-                <v-table>
-                    <tbody>
-                        <tr v-for="(item, index) in touziPingTe" :key="index">
-                            <td>
-                                <div class="text-h6 font-weight-bold">
-                                    {{ `${String(item.batch_start).padStart(3, '0')}-${String(item.batch_end).padStart(3, '0')}期:` }}
-                                    <span class="text-red">【{{ item.zodiac_name }}{{ item.zodiac_name }}】</span>
-                                    <span v-if="item.is_finished">开({{ item.open_count }}期)</span>
-                                    <span v-else>开({{ item.open_count > 0 ? item.open_count : '?' }}期)</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </v-table>
-            </div>
-
-            <div class="border rounded-lg mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">给你一期内幕,也要懂得下注</div>
-                <v-table>
-                    <tbody>
-                        <tr>
-                            <td class="font-weight-bold">七肖:<span class="text-red">{{ qixiao?.xiaos?.join('') }}</span></td>
-                            <td class="font-weight-bold">7码:<span class="text-red">{{ qixiao?.numbers?.join('.') }}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="font-weight-bold">五肖:<span class="text-red">{{ wuxiao?.xiaos?.join('') }}</span></td>
-                            <td class="font-weight-bold">5码:<span class="text-red">{{ wuxiao?.numbers?.join('.') }}</span></td>
-                        </tr>
-                        <tr>
-                            <td class="font-weight-bold">三肖:<span class="text-red">{{ sanxiao?.xiaos?.join('') }}</span></td>
-                            <td class="font-weight-bold">3码:<span class="text-red">{{ sanxiao?.numbers?.join('.') }}</span></td>
-                        </tr>
-                    </tbody>
-                </v-table>
-            </div>
-            
-            <div class="border rounded-lg mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">大神双波</div>
-                <v-table>
-                    <tbody>
-                        <tr v-for="(item, index) in doubleColor" :key="index">
-                            <td>
-                                <div class="text-h6 font-weight-bold">
-                                    {{ `${String(item.batch_number).padStart(3, '0')}期:` }}
-                                    <span class="text-red">
-                                        【<span :class="{'bg-amber': item.color_one === item.match_color}">{{ colorsMap[item.color_one] }}波</span>+<span :class="{'bg-amber': item.color_two === item.match_color}">{{ colorsMap[item.color_two] }}波</span>】
-                                    </span>
-                                    <span>开:
-                                        <span v-if="item.result_number == 0">?</span>
-                                        <span v-else class="text-blue">{{ item.zodiac_name }}{{ String(item.result_number).padStart(2, '0') }}</span>
-                                        <span v-if="item.match_color == item.color_one || item.match_color == item.color_two">对</span>
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </v-table>
-            </div>
-
-            <div v-if="zodiacFeeds.length > 0" class="border rounded-lg mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-primary rounded-t-lg">
-                    <div>草菜肉肖</div>
-                    <div style="font-size: 1rem;"><span class="text-amber">吃草:牛羊马兔</span> <span class="text-purple">吃肉:虎蛇龙狗</span> <span class="text-error">吃菜:猪鼠鸡猴</span></div>
-                </div>
-                <v-table>
-                    <tbody>
-                        <tr v-for="(item, index) in zodiacFeeds" :key="index">
-                            <td>
-                                <div class="text-h6 font-weight-bold">
-                                    {{ `${String(item.batch_number).padStart(3, '0')}期:` }}
-                                    <span class="text-red">
-                                        【<span :class="{'bg-amber': zodiacFeedMap[feedMap[item.feed_one]].includes(item.result_zodiac_name)}">{{ feedMap[item.feed_one] }}</span>+<span :class="{'bg-amber': zodiacFeedMap[feedMap[item.feed_two]].includes(item.result_zodiac_name)}">{{ feedMap[item.feed_two] }}</span>】
-                                    </span>
-                                    <span>开:
-                                        <span v-if="item.result_number == 0">?</span>
-                                        <span v-else class="text-blue">{{ item.result_zodiac_name }}{{ String(item.result_number).padStart(2, '0') }}</span>
-                                        <span v-if="zodiacFeedMap[feedMap[item.feed_one]].includes(item.result_zodiac_name) || zodiacFeedMap[feedMap[item.feed_two]].includes(item.result_zodiac_name)">对</span>
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </v-table>
-            </div>
-
+            <ReferenceLink />
+            <ResultGuesses />
+            <Touzipingte />
+            <XiaoMa />
+            <DoubleColor />
+            <ZodiacFeed />
             <MustWin3Batch />
             <TenWinSpecial />
 
@@ -183,101 +74,12 @@
                     </v-col>
                 </v-row>
             </div>
-            
-            <div class="border rounded-lg">
-                <div class="text-center font-weight-bold text-h6 bg-grey-lighten-3 rounded-t-lg">{{ currentYear }}年（十二生肖号码对照）</div>
-                <div class="pa-2">
-                    <v-row dense>
-                        <v-col cols="6" v-for="(zodiac, index) in xZodiacs[currentYear]" :key="index">
-                            <div class="border rounded-lg pa-2 d-flex flex-column align-center">
-                                <div class="font-weight-bold text-subtitle-1">{{ zodiac.name }}</div>
-                                <v-img v-if="zodiac.key" :src="getImg(zodiac.key)" width="50"></v-img>
-                                <div class="d-flex flex-wrap justify-center">
-                                    <div v-for="(num, i) in zodiac.numbers" :key="i" :class="`bg-${num.color}`" class="mr-1">
-                                        <span class="pa-1">{{ num.num }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </v-col>
-                    </v-row>
-                </div>
-            </div>
-            <div class="border rounded-lg mt-3">
-                <div class="text-center font-weight-bold text-h6 bg-grey-lighten-3 rounded-t-lg">五行对照</div>
-                <div>
-                    <v-table density="compact">
-                        <tbody>
-                            <tr v-for="(number, index) in wuxing" :key="index">
-                                <td style="width: 25px;">{{ wuxingMap[index] }}</td>
-                                <td>
-                                    <div class="d-flex">
-                                        <div v-for="(num, i) in number" :key="i" :class="`bg-${num.color}`" class="mr-1">
-                                            <span class="pa-1">{{ num.num }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </v-table>
-                </div>
-            </div>
-            <div class="border rounded-lg mt-3">
-                <div class="text-center font-weight-bold text-h6 bg-grey-lighten-3 rounded-t-lg">波色对照</div>
-                <div>
-                    <v-table density="compact">
-                        <tbody>
-                            <tr v-for="(color, index) in colors" :key="index">
-                                <td style="width: 25px;" :class="`text-${index}`">{{ colorsMap[index] }}</td>
-                                <td>
-                                    <div class="d-flex">
-                                        <div v-for="(num, i) in color" :key="i" :class="`bg-${index}`" class="mr-1">
-                                            <span class="pa-1">{{ num }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </v-table>
-                </div>
-            </div>
-            <div class="border rounded-lg mt-3 mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-grey-lighten-3 rounded-t-lg">合数单双</div>
-                <div>
-                    <v-table density="compact">
-                        <tbody>
-                            <tr v-for="(oe, index) in oddEvens" :key="index">
-                                <td style="min-width: 80px;">{{ oddEvenMap[index] }}</td>
-                                <td>
-                                    <div class="d-flex">
-                                        <div v-for="(num, i) in oe" :key="i" :class="`bg-${num.color}`" class="mr-1">
-                                            <span class="pa-1">{{ num.num }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </v-table>
-                </div>
-            </div>
-            <div class="border rounded-lg mt-3 mb-3">
-                <div class="text-center font-weight-bold text-h6 bg-grey-lighten-3 rounded-t-lg">生肖属性</div>
-                <div>
-                    <v-table density="compact">
-                        <tbody>
-                            <tr v-for="(attribute, index) in attributes" :key="index">
-                                <td style="min-width: 80px;" class="text-primary">{{ attribute.attribute_name }}</td>
-                                <td>
-                                    <div class="d-flex">
-                                        <div v-for="(zoc, i) in attribute.zodiacs" :key="i">
-                                            <span class="pa-1">{{ zoc }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </v-table>
-                </div>
-            </div>
+
+            <Zodiac />
+            <WuXing />
+            <ColorMap />
+            <OddEven />
+            <ZodiacAttr />
         </div>
 
         <v-dialog v-model="previewImageDialog" transition="dialog-bottom-transition" fullscreen>
@@ -298,13 +100,24 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { GET_BANNERS, GET_LAST_RECORD, GET_RESULT_GUESS, GET_XIAO_MA, GET_TOUZI_PING_TE, GET_DOUBLE_COLOR, GET_REFERENCE_LINK, REFERENCE_IMAGES, ZODIAC_FEED } from '../js/api';
+import { GET_BANNERS, GET_LAST_RECORD, GET_DOUBLE_COLOR, REFERENCE_IMAGES } from '../js/api';
 import { useZodiacStore } from '../stores/zodiac';
 import router from '../routers';
 import Appbar from '../components/Appbar.vue';
 import { useGlobalStore } from '../stores/global';
 import MustWin3Batch from '../components/home/MustWin3Batch.vue';
 import TenWinSpecial from '../components/home/TenWinSpecial.vue';
+import ReferenceLink from '../components/home/ReferenceLink.vue';
+import ResultGuesses from '../components/home/ResultGuesses.vue';
+import Touzipingte from '../components/home/Touzipingte.vue';
+import XiaoMa from '../components/home/XiaoMa.vue';
+import DoubleColor from '../components/home/DoubleColor.vue';
+import ZodiacFeed from '../components/home/ZodiacFeed.vue';
+import Zodiac from '../components/home/Zodiac.vue';
+import WuXing from '../components/home/WuXing.vue';
+import ColorMap from '../components/home/ColorMap.vue';
+import OddEven from '../components/home/OddEven.vue';
+import ZodiacAttr from '../components/home/ZodiacAttr.vue';
 
 const zodiacStore = useZodiacStore();
 const globalStore = useGlobalStore();
@@ -328,15 +141,7 @@ const gettingLastRecord = ref(false);
 const lastRecord = ref({});
 const lastRecordArr = ref([]);
 const banners = ref([]);
-const resultGuesses = ref([]);
-const qixiao = ref({});
-const wuxiao = ref({});
-const sanxiao = ref({});
-const touziPingTe = ref([]);
-const doubleColor = ref([]);
-const referenceLinks = ref([]);
 const referenceImages = ref([]);  
-const zodiacFeeds = ref([]); 
 const displayCountDown = ref(false);
 const countDown = ref('');
 const countdownFinished = ref(false);
@@ -347,7 +152,6 @@ const displayOpenTimeString = ref(false);
 const previewImageDialog = ref(false);
 const previewImageSrc = ref('');
 
-const getImg = (name) => new URL(`../assets/sx/sx_${name}.gif`, import.meta.url).href
 const getCircleBallImg = (num_desc) => {
     if (!num_desc) {
         return new URL(`../assets/circle-ball/grey-circle.png`, import.meta.url).href;
@@ -359,33 +163,6 @@ const getZodiacName = (num_desc) => {
     if (!num_desc) return '-';
     const desc = num_desc?.split('/');
     return desc[0] + '/' + desc[1];
-}
-
-const wuxingMap = {
-    'jin': '金',
-    'mu': '木',
-    'shui': '水',
-    'huo': '火',
-    'tu': '土'
-};
-const colorsMap = {
-    'red': '红',
-    'blue': '蓝',
-    'green': '绿'
-};
-const oddEvenMap = {
-    'odd': '合数单',
-    'even': '合数双'
-};
-const feedMap = {
-    1: '草',
-    2: '肉',
-    3: '菜'
-}
-const zodiacFeedMap = {
-    '草': ['牛', '羊', '马', '兔'],
-    '肉': ['虎', '蛇', '龙', '狗'],
-    '菜': ['猪', '鼠', '鸡', '猴']
 }
 
 const getBanners = async () => {
@@ -564,77 +341,10 @@ watch(
     { immediate: true }
 );
 
-const getResultGuesses = async () => {
-    const res = await GET_RESULT_GUESS();
-    if (res.code === 1000) {
-        resultGuesses.value = res.data;
-    }
-};
-
-const getXiaoMa = async () => {
-    const res = await GET_XIAO_MA();
-    if (res.code === 1000) {
-        const data = res.data;
-        const qixiaoData = data.find(item => item.type === 'qi_xiao') || {};
-        const wuxiaoData = data.find(item => item.type === 'wu_xiao') || {};    
-        const sanxiaoData = data.find(item => item.type === 'san_xiao') || {};
-
-        const splited7 = qixiaoData.val.split('|');
-        if(splited7.length === 2) {
-            qixiao.value = {
-                xiaos: splited7[0].split(','),
-                numbers: splited7[1].split(','),
-            }
-        }
-        const splited5 = wuxiaoData.val.split('|');
-        if(splited5.length === 2) {
-            wuxiao.value = {
-                xiaos: splited5[0].split(','),
-                numbers: splited5[1].split(','),
-            }
-        }
-        const splited3 = sanxiaoData.val.split('|');
-        if(splited3.length === 2) {
-            sanxiao.value = {
-                xiaos: splited3[0].split(','),
-                numbers: splited3[1].split(','),
-            }
-        }
-    }
-};
-
-const getTouziPingTe = async () => {
-    const res = await GET_TOUZI_PING_TE();
-    if (res.code === 1000) {
-        touziPingTe.value = res.data;
-    }
-};
-
-const getDoubleColor = async () => {
-    const res = await GET_DOUBLE_COLOR();
-    if (res.code === 1000) {
-        doubleColor.value = res.data;
-    }
-}
-
-const getReferenceLinks = async () => {
-    const res = await GET_REFERENCE_LINK();
-    if (res.code === 1000) {
-        referenceLinks.value = res.data;
-    }
-}
-
 const getReferenceImages = async () => {
     const res = await REFERENCE_IMAGES();
     if (res.code === 1000) {
         referenceImages.value = res.data;
-    }
-}
-
-const getZodiacFeeds = async () => {
-    const res = await ZODIAC_FEED();
-    if (res.code === 1000) {
-        zodiacFeeds.value = res.data;
     }
 }
 
@@ -668,13 +378,7 @@ onMounted(async () => {
     zodiacStore.orderZodiac();
     getBanners();
     getLastRecord(currentRecordType.value);
-    getResultGuesses();
-    getXiaoMa();
-    getTouziPingTe();
-    getDoubleColor();
-    getReferenceLinks();
     getReferenceImages();
-    getZodiacFeeds();
 });
 
 </script>
