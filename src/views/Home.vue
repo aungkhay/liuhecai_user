@@ -13,7 +13,8 @@
             </v-card>
             <div v-if="lastRecordArr.length > 0" class="bg-white my-2 mx-2 px-2 rounded-lg">
                 <div class="d-flex align-center justify-space-between pt-1">
-                    <div class="font-weight-bold">{{ lastRecord?.batch_number }}期</div>
+                    <div class="font-weight-bold" v-if="currentRecordType == 'platform'">澳博六合彩第20{{ lastRecord?.batch_number }}期</div>
+                    <div class="font-weight-bold" v-else>{{ lastRecord?.batch_number }}期</div>
                     <div class="text-red text-caption">{{ displayCountDown && currentRecordType == 'platform' ? countDown : '开奖记录' }}</div>
                 </div>
                 <div  class="d-flex align-center justify-space-between" @click="displayCountDown ? {} : goHistory(currentRecordType)">
@@ -452,14 +453,13 @@ const prepareNextRecordDisplay = () => {
             // ✅ reset flag if still counting
             countdownFinished.value = false;
 
+            const hours = Math.floor(distance / (1000 * 60 * 60));
             const minutes = Math.floor(
                 (distance % (1000 * 60 * 60)) / (1000 * 60)
             );
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            countDown.value = `${String(minutes).padStart(2, '0')}:${String(
-                seconds
-            ).padStart(2, '0')}`;
+            countDown.value = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
     } else {
         displayCountDown.value = false;
