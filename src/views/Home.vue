@@ -15,13 +15,9 @@
                 <div class="d-flex align-center justify-space-between pt-1">
                     <div class="font-weight-bold" v-if="currentRecordType == 'platform'">澳博六合彩第20{{ lastRecord?.batch_number }}期</div>
                     <div class="font-weight-bold" v-else>{{ lastRecord?.batch_number }}期</div>
-                    <div class="text-red text-caption">{{ displayCountDown && currentRecordType == 'platform' ? countDown : '开奖记录' }}</div>
+                    <div class="text-red text-caption">开奖记录</div>
                 </div>
-                <div  class="d-flex align-center justify-space-between" @click="displayCountDown ? {} : goHistory(currentRecordType)">
-                    <!-- <div class="mr-2" style="min-width: 60px;">
-                        <div class="font-weight-bold">{{ lastRecord?.batch_number }}期</div>
-                        <div class="text-red text-caption">{{ displayCountDown && currentRecordType == 'platform' ? countDown : '开奖记录' }}</div>
-                    </div> -->
+                <div  class="d-flex align-center justify-space-between" @click="goHistory(currentRecordType)">
                     <div v-if="gettingLastRecord" style="min-height: 69.5px;" class="d-flex align-center justify-center">
                         <v-progress-circular indeterminate size="24" width="2" color="primary"></v-progress-circular>
                     </div>
@@ -29,21 +25,24 @@
                         <div v-for="n in (lastRecordArr.length === 7 ? 6 : lastRecordArr.length)" :key="n" class="mr-1">
                             <div class="circle-wrapper">
                                 <v-img :src="getCircleBallImg(lastRecordArr[n - 1]?.desc)" width="40" height="40" cover/>
-                                <div class="circle-text text-caption" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[n - 1]?.num }}</div>
+                                <div class="circle-text" :class="{ 'text-grey': lastRecordArr[n - 1]?.desc == null && currentRecordType == 'platform' }">{{ lastRecordArr[n - 1]?.num }}</div>
                             </div>
-                            <div class="text-center">{{ getZodiacName(lastRecordArr[n - 1]?.desc) }}</div>
+                            <div class="text-center" style="font-size: 0.9rem;">{{ getZodiacName(lastRecordArr[n - 1]?.desc) }}</div>
                         </div>
                         <div v-if="lastRecordArr.length === 7"><v-icon size="small">mdi-plus</v-icon></div>
                         <div v-if="lastRecordArr.length === 7">
                             <div class="circle-wrapper mr-1">
                                 <v-img :src="getCircleBallImg(lastRecordArr[6]?.desc)" width="40" height="40" cover/>
-                                <div class="circle-text text-caption" :class="{ 'text-grey': displayCountDown && currentRecordType == 'platform' }">{{ lastRecordArr[6]?.num }}</div>
+                                <div class="circle-text" :class="{ 'text-grey': lastRecordArr[6]?.desc == null && currentRecordType == 'platform' }">{{ lastRecordArr[6]?.num }}</div>
                             </div>
-                            <div class="text-center" >{{ getZodiacName(lastRecordArr[6]?.desc) }}</div>
+                            <div class="text-center" style="font-size: 0.9rem;">{{ getZodiacName(lastRecordArr[6]?.desc) }}</div>
                         </div>
                     </div>
                 </div>
-                <div v-if="currentRecordType == 'platform' && displayOpenTimeString" class="text-red font-weight-semibold" style="font-size: 15px;">{{ openTimeString }}</div>
+                <div v-if="serverHour != openHour || (serverHour == openHour && serverMinute < 30)" class="text-red font-weight-semibold text-caption" style="font-size: 13px;">
+                    {{ openTimeString }} 
+                    <span class="text-purple"><span class="">倒计时: </span>{{ countdownString }}</span>
+                </div>
             </div>
         </div>
 
@@ -145,9 +144,15 @@ const referenceImages = ref([]);
 const displayCountDown = ref(false);
 const countDown = ref('');
 const countdownFinished = ref(false);
+
 const openHour = ref(20);
 const openMinute = ref(32);
+const serverHour = ref(0);
+const serverMinute = ref(0);
+const serverSecond = ref(0);
+
 const openTimeString = ref('');
+const countdownString = ref('');
 const displayOpenTimeString = ref(false);
 const previewImageDialog = ref(false);
 const previewImageSrc = ref('');
@@ -173,6 +178,7 @@ const getBanners = async () => {
 };
 
 const goHistory = (type) => {
+    if (serverHour.value == openHour.value && serverMinute.value >= openMinute.value && serverMinute.value <= openMinute.value + 2) return;
     router.push({ name: 'RecordHistory', query: { type } });
 };
 
@@ -189,95 +195,44 @@ const getLastRecord = async (type) => {
     }, 500);
 };
 
-const prepareNextRecordDisplay = () => {
-    const serverDate = new Date(serverTime.value);
-    const serverHour = serverDate.getHours();
-    const serverMinute = serverDate.getMinutes();
+function pad(n) { return String(n).padStart(2, "0"); }
 
-    if (
-        serverHour === openHour.value &&
-        serverMinute >= 0 &&
-        serverMinute <= openMinute.value
-    ) {
-        displayCountDown.value = true;
+watch(() => serverTime.value, (newVal) => {
+    if (newVal) {
+        const serverDate = new Date(newVal);
+        serverHour.value = serverDate.getHours();
+        serverMinute.value = serverDate.getMinutes();
+        serverSecond.value = serverDate.getSeconds();
 
-        const countDownTarget = new Date(
-            new Date(serverTime.value).setHours(
-                openHour.value,
-                openMinute.value,
-                0,
-                0
-            )
-        ).getTime();
-
-        const now = serverDate.getTime();
-        const distance = countDownTarget - now;
-
-        if (distance <= 0) {
-            // ✅ prevent multiple calls
-            if (!countdownFinished.value) {
-                console.log('Countdown finished. Fetching last record...');
-                countdownFinished.value = true;
-
-                setTimeout(() => {
-                    displayCountDown.value = false;
-                    getLastRecord(currentRecordType.value);
-                    location.reload(); // reload to reset any potential state issues
-                }, 15000);
-            }
-            return;
-        } else {
-            // ✅ reset flag if still counting
-            countdownFinished.value = false;
-
-            const hours = Math.floor(distance / (1000 * 60 * 60));
-            const minutes = Math.floor(
-                (distance % (1000 * 60 * 60)) / (1000 * 60)
-            );
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            countDown.value = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        // reload page at 8:32 PM
+        if (serverHour.value == openHour.value && serverMinute.value == openMinute.value && serverSecond.value == 20) {
+            window.location.reload();
         }
-    } else {
-        displayCountDown.value = false;
-        countdownFinished.value = false; // reset when outside window
-    }
-};
 
-watch(
-    () => serverTime.value,
-    (newVal) => {
-        if (newVal) {
-            const serverDate = new Date(newVal);
-            const serverHour = serverDate.getHours();
-            const serverMinute = serverDate.getMinutes();
-            const serverSecond = serverDate.getSeconds();
-            // reload when server time is 21:15:15
-            if (serverHour == openHour.value && serverMinute == openMinute.value && serverSecond == 15) {
-                location.reload();
-            }
+        // Start: today 9:00 PM
+        const start = new Date(serverDate.getFullYear(), serverDate.getMonth(), serverDate.getDate(), 21, 0, 0);
+
+        // End: next day 8:32 PM
+        const end = new Date(start);
+        end.setDate(end.getDate() + 1);
+        end.setHours(20, 32, 0, 0);
         
-            if (displayCountDown.value) {
-                prepareNextRecordDisplay();
-            } else {
-                // Check if we should start the countdown when server time updates
-                const serverDate = new Date(newVal);
-                const serverHour = serverDate.getHours();
-                const serverMinute = serverDate.getMinutes();
+        const t = new Date();
+        let remainingMs = serverHour.value > openHour.value ? end - t : start.getTime() - t.getTime() - 1680000;
 
-                if (
-                    currentRecordType.value === 'platform' &&
-                    serverHour === openHour.value &&
-                    serverMinute >= 0 &&
-                    serverMinute <= openMinute.value
-                ) {
-                    prepareNextRecordDisplay();
-                }
-            }
+        if (remainingMs <= 0) {
+            countdownString.value = "00:00:00";
+            return;
         }
-    },
-    { immediate: true }
-)
+
+        const totalSeconds = Math.floor(remainingMs / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        countdownString.value = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    }
+}, { immediate: true });
 
 watch(
     () => lastRecord.value,
@@ -294,11 +249,6 @@ watch(
             { num: '06', desc: null },
             { num: '07', desc: null },
         ];
-        console.log(displayCountDown.value)
-        if (currentRecordType.value == 'platform' && displayCountDown.value) {
-            lastRecord.value.batch_number = platformNextBatchNumber.value;
-            return;
-        }
 
         const num1 = { num: String(newVal.num1).padStart(2, '0'), desc: newVal.num1_desc };
         const num2 = { num: String(newVal.num2).padStart(2, '0'), desc: newVal.num2_desc };
@@ -310,7 +260,7 @@ watch(
 
         const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 120000; // 开奖时间+120秒
         const timeNow = Date.now();
-        console.log(timeToDisplay, timeNow)
+        // console.log(timeToDisplay, timeNow)
         
         if (currentRecordType.value === 'platform' && timeToDisplay >= timeNow) {
             let setIndex = 0;
@@ -397,7 +347,7 @@ onMounted(async () => {
     align-items: center;
     justify-content: center;
     /* font-weight: bold; */
-    font-size: 22px;
+    font-size: 18px;
     z-index: 2;
 }
 
