@@ -146,7 +146,7 @@ const countDown = ref('');
 const countdownFinished = ref(false);
 
 const openHour = ref(20);
-const openMinute = ref(32);
+const openMinute = ref(34);
 const serverHour = ref(0);
 const serverMinute = ref(0);
 const serverSecond = ref(0);
@@ -212,10 +212,10 @@ watch(() => serverTime.value, (newVal) => {
         // Start: today 9:00 PM
         const start = new Date(serverDate.getFullYear(), serverDate.getMonth(), serverDate.getDate(), 21, 0, 0);
 
-        // End: next day 8:32 PM
+        // End: next day 8:34 PM
         const end = new Date(start);
         end.setDate(end.getDate() + 1);
-        end.setHours(20, 32, 0, 0);
+        end.setHours(20, 34, 0, 0);
         
         const t = new Date();
         let remainingMs = serverHour.value > openHour.value ? end - t : start.getTime() - t.getTime() - 1680000;
@@ -258,7 +258,7 @@ watch(
         const num6 = { num: String(newVal.num6).padStart(2, '0'), desc: newVal.num6_desc };
         const num7 = { num: String(newVal.num7).padStart(2, '0'), desc: newVal.num7_desc };
 
-        const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 120000; // 开奖时间+120秒
+        const timeToDisplay = (new Date(newVal.createdAt).getTime()) + 70000; // 开奖时间+70秒
         const timeNow = Date.now();
         // console.log(timeToDisplay, timeNow)
         
@@ -268,8 +268,8 @@ watch(
                 const secondsPassed = Math.floor((Date.now() - new Date(newVal.createdAt).getTime()) / 1000);
                 console.log('Seconds passed since record creation:', secondsPassed);
 
-                // calculate setIndex based on secondsPassed by 17 seconds, so that every 17 seconds, a new number is revealed
-                setIndex = Math.floor(secondsPassed / 17);
+                // calculate setIndex based on secondsPassed by 10 seconds, so that every 10 seconds, a new number is revealed
+                setIndex = Math.floor(secondsPassed / 10);
 
                 if (secondsPassed > 0) {
                     if (setIndex * 10 <= secondsPassed) {
@@ -278,7 +278,7 @@ watch(
                         }
                         setIndex++;
                     }
-                    if (secondsPassed >= 120) {
+                    if (secondsPassed >= 70) {
                         clearInterval(interval);
                     }
                 }
