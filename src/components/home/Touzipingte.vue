@@ -6,7 +6,7 @@
                 <tr v-for="(item, index) in touziPingTe" :key="index">
                     <td>
                         <div class="text-h6 font-weight-bold">
-                            {{ `${String(item.batch_start).padStart(3, '0')}-${String(item.batch_end).padStart(3, '0')}期:` }}
+                            {{ `${String(item.batch_start).replace(/^26/, "")}-${String(item.batch_end).replace(/^26/, "")}期:` }}
                             <span class="text-red">【{{ item.zodiac_name }}{{ item.zodiac_name }}】</span>
                             <span v-if="item.is_finished">开({{ item.open_count }}期)</span>
                             <span v-else>开({{ item.open_count > 0 ? item.open_count : '?' }}期)</span>

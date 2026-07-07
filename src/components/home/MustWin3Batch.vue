@@ -6,9 +6,9 @@
                 <tr v-for="(item, index) in mustWin3Batch" :key="index">
                     <td>
                         <div class="text-h6 font-weight-bold pr-1">
-                            <div>{{ item.batch_one }}期</div>
-                            <div>{{ item.batch_two }}期</div>
-                            <div>{{ item.batch_three }}期</div>
+                            <div>{{ item.batch_one.replace(/^26/, "") }}期</div>
+                            <div>{{ item.batch_two.replace(/^26/, "") }}期</div>
+                            <div>{{ item.batch_three.replace(/^26/, "") }}期</div>
                         </div>
                     </td>
                     <td>

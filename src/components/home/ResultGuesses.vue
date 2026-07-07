@@ -5,7 +5,7 @@
             <tbody>
                 <tr v-for="(result, index) in resultGuesses" :key="index">
                     <td class="text-h6 font-weight-bold">
-                        <span>{{ `${result.batch_number.padStart(3, '0')}期:` }}</span>
+                        <span>{{ `${result.batch_number.replace(/^26/, "")}期:` }}</span>
                         <span class="text-red">【{{ result.zodiac_attr }}】</span>
                         <span v-if="result.result_match == 0">开:?</span>
                         <span v-if="result.result_match == 1">开:<span class="text-red">{{ `${String(result.result_number).padStart(2, '0')}${result.zodiac_name}` }}</span>对</span>

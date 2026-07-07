@@ -9,7 +9,7 @@
                 <tr v-for="(item, index) in zodiacFeeds" :key="index">
                     <td>
                         <div class="text-h6 font-weight-bold">
-                            {{ `${String(item.batch_number).padStart(3, '0')}期:` }}
+                            {{ `${String(item.batch_number).replace(/^26/, "")}期:` }}
                             <span class="text-red">
                                 【<span :class="{'bg-amber': zodiacFeedMap[feedMap[item.feed_one]].includes(item.result_zodiac_name)}">{{ feedMap[item.feed_one] }}</span>+<span :class="{'bg-amber': zodiacFeedMap[feedMap[item.feed_two]].includes(item.result_zodiac_name)}">{{ feedMap[item.feed_two] }}</span>】
                             </span>

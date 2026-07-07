@@ -6,7 +6,7 @@
                 <tr v-for="(item, index) in doubleColor" :key="index">
                     <td>
                         <div class="text-h6 font-weight-bold">
-                            {{ `${String(item.batch_number).padStart(3, '0')}期:` }}
+                            {{ `${String(item.batch_number).replace(/^26/, "")}期:` }}
                             <span class="text-red">
                                 【<span :class="{'bg-amber': item.color_one === item.match_color}">{{ colorsMap[item.color_one] }}波</span>+<span :class="{'bg-amber': item.color_two === item.match_color}">{{ colorsMap[item.color_two] }}波</span>】
                             </span>

@@ -6,7 +6,7 @@
                 <tr v-for="(item, index) in tenWinSpecial" :key="index">
                     <td>
                         <div class="text-h6 font-weight-bold d-flex justify-space-between">
-                            <div>{{ item.batch_number }}期</div>
+                            <div>{{ item.batch_number.replace(/^26/, "") }}期</div>
                             <div>开:
                                 <span class="text-red" v-if="item.result_number">{{ item.result_zodiac }}{{ String(item.result_number).padStart(2, '0') }}</span>
                                 <span v-else>?</span>
